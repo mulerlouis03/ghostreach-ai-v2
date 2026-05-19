@@ -6,9 +6,8 @@ import OpenAI from "openai";
 dotenv.config();
 
 const app = express();
-
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -23,29 +22,22 @@ app.post("/generate", async (req, res) => {
         ? "Écris uniquement en créole haïtien naturel, vendeur et moderne."
         : "Écris uniquement en français naturel, moderne et vendeur.";
 
-    const websiteInstruction = website
-      ? `Ajoute ce lien intelligemment : ${website}`
-      : "";
-
     const prompt = `
-Tu es un expert mondial du marketing digital.
+Tu es un expert en marketing digital.
 
 ${languageInstruction}
 
-Business :
-${business}
-
-${websiteInstruction}
-
-Type :
-${type}
+Business : ${business}
+Lien web : ${website || "aucun lien"}
+Type de contenu : ${type}
 
 Règles :
-- Sois vendeur
-- Moderne
-- Utilise emojis intelligemment
-- Fais un appel à l'action
-- Texte prêt à publier
+- texte prêt à publier
+- vendeur
+- simple
+- humain
+- emojis intelligents
+- appel à l'action clair
 `;
 
     const completion = await client.chat.completions.create({
@@ -53,13 +45,10 @@ Règles :
       messages: [{ role: "user", content: prompt }],
     });
 
-    res.json({
-      result: completion.choices[0].message.content,
-    });
+    res.json({ result: completion.choices[0].message.content });
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({
+      result: "Erreur texte IA",
       error: error.message,
     });
   }
@@ -67,42 +56,37 @@ Règles :
 
 app.post("/generate-image", async (req, res) => {
   try {
-    const { business, type } = req.body;
+    const { business, type, language } = req.body;
 
-    const imagePrompt = `
-Create a premium social media advertising poster for:
+    const prompt = `
+Crée une affiche publicitaire moderne pour les réseaux sociaux.
 
-${business}
+Business : ${business}
+Type : ${type}
+Langue : ${language}
 
-Style:
-- modern marketing
-- ultra realistic
-- social media ad
-- vibrant colors
-- luxury branding
-- high quality
-- professional lighting
-- mobile marketing style
-- add marketing visual effects
-
-Content type:
-${type}
-
-Make it look like a real Facebook/Instagram advertisement.
+Style :
+- design premium
+- affiche marketing professionnelle
+- adaptée Facebook, Instagram, WhatsApp
+- couleurs modernes bleu, blanc, violet
+- visuel propre et attractif
+- sans texte trop long
+- style startup / Canva / publicité mobile
 `;
 
     const image = await client.images.generate({
       model: "gpt-image-1",
-      prompt: imagePrompt,
+      prompt,
       size: "1024x1024",
     });
 
-    res.json({
-  image: `data:image/png;base64,${image.data[0].b64_json}`,
-});
-  } catch (error) {
-    console.log(error);
+    const base64 = image.data[0].b64_json;
 
+    res.json({
+      image: `data:image/png;base64,${base64}`,
+    });
+  } catch (error) {
     res.status(500).json({
       error: error.message,
     });

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./style.css";
 
-const API_URL = "https://ghostreach-ai-v2.onrender.com/generate";
+const API_URL = "https://ghostreach-ai-v2.onrender.com";
 const SITE_URL = "https://ghostreach-ai.netlify.app";
 
 function App() {
@@ -14,22 +14,15 @@ function App() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [logo, setLogo] = useState(null);const [imageLoading, setImageLoading] = useState(false);
-const [generatedImage, setGeneratedImage] = useState("");
-  const [installPrompt, setInstallPrompt] = useState(null);
-  const [showInstall, setShowInstall] = useState(true);
+  const [logo, setLogo] = useState(null);
+  const [generatedImage, setGeneratedImage] = useState("");
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageError, setImageError] = useState("");
 
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem("copynova_history");
     return saved ? JSON.parse(saved) : [];
   });
-
-  useEffect(() => {
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      setInstallPrompt(e);
-    });
-  }, []);
 
   function saveHistory(item) {
     const updated = [item, ...history].slice(0, 20);
@@ -43,17 +36,6 @@ const [generatedImage, setGeneratedImage] = useState("");
     setLogo(URL.createObjectURL(file));
   }
 
-  async function installApp() {
-    if (installPrompt) {
-      installPrompt.prompt();
-      await installPrompt.userChoice;
-      setInstallPrompt(null);
-      setShowInstall(false);
-    } else {
-      alert("Sur iPhone : appuie sur Partager, puis “Sur l’écran d’accueil”.");
-    }
-  }
-
   async function generate() {
     if (!business.trim()) {
       setResult("⚠️ Écris d’abord le nom ou l’idée de ton business.");
@@ -65,7 +47,7 @@ const [generatedImage, setGeneratedImage] = useState("");
     setResult("⏳ Connexion à l’IA...");
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_URL}/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ business: business.trim(), website, type, language }),
@@ -94,34 +76,32 @@ const [generatedImage, setGeneratedImage] = useState("");
   }
 
   async function generateImage() {
-  setImageLoading(true);
+    setImageLoading(true);
+    setImageError("");
+    setGeneratedImage("");
 
-  try {
-    const response = await fetch(
-      "https://ghostreach-ai-v2.onrender.com/generate-image",
-      {
+    try {
+      const response = await fetch(`${API_URL}/generate-image`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          business,
-          type,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ business, type, language }),
+      });
+
+      const data = await response.json();
+
+      if (data.image) {
+        setGeneratedImage(data.image);
+      } else {
+        setImageError("❌ Image non générée : " + (data.error || "erreur inconnue"));
       }
-    );
-
-    const data = await response.json();
-
-    if (data.image) {
-      setGeneratedImage(data.image);
+    } catch {
+      setImageError("❌ Impossible de contacter le serveur image.");
+    } finally {
+      setImageLoading(false);
     }
-  } catch (error) {
-    console.log(error);
-  } finally {
-    setImageLoading(false);
   }
-}async function copyText(text = result) {
+
+  async function copyText(text = result) {
     if (!text) return;
     await navigator.clipboard.writeText(text);
     setCopied(true);
@@ -139,14 +119,6 @@ const [generatedImage, setGeneratedImage] = useState("");
 
   return (
     <div className="app">
-      {showInstall && (
-        <div className="installBanner">
-          <span>📲 Installe CopyNova AI sur ton téléphone</span>
-          <button onClick={installApp}>Installer</button>
-          <button className="closeInstall" onClick={() => setShowInstall(false)}>×</button>
-        </div>
-      )}
-
       <aside className="sidebar">
         <div className="brand">
           <div className="logoMark">✦</div>
@@ -163,17 +135,6 @@ const [generatedImage, setGeneratedImage] = useState("");
           <button>💎 Premium</button>
           <button>⚙️ Réglages</button>
         </nav>
-
-        <div className="premiumBox">
-          <strong>👑 Passez Premium</strong>
-          <p>Débloquez plus de générations, contenus illimités et fonctionnalités avancées.</p>
-          <button>Découvrir</button>
-        </div>
-
-        <div className="userBox">
-          <div>U</div>
-          <span><strong>Utilisateur</strong><small>Gratuit</small></span>
-        </div>
       </aside>
 
       <main className="main">
@@ -182,16 +143,10 @@ const [generatedImage, setGeneratedImage] = useState("");
             <header className="hero">
               <div>
                 <h1>Crée du contenu marketing puissant avec l’IA</h1>
-                <p>Génère des pubs Facebook, messages WhatsApp, scripts TikTok, slogans et contenus sociaux en français ou créole haïtien.</p>
+                <p>Génère textes et affiches publicitaires pour Facebook, WhatsApp, Instagram et TikTok.</p>
               </div>
               <button className="premiumTop">👑 Passer Premium</button>
             </header>
-
-            <section className="statsGrid">
-              <div className="statCard"><span>⚡</span><div><strong>Rapide</strong><p>Contenu prêt à publier</p></div></div>
-              <div className="statCard"><span>HT</span><div><strong>Bilingue</strong><p>Français & Kreyòl Ayisyen</p></div></div>
-              <div className="statCard"><span>📱</span><div><strong>Mobile</strong><p>Installable sans store</p></div></div>
-            </section>
 
             <section className="workspace">
               <div className="panel">
@@ -208,10 +163,10 @@ const [generatedImage, setGeneratedImage] = useState("");
                 )}
 
                 <label>Nom ou idée du business</label>
-                <input value={business} onChange={(e) => setBusiness(e.target.value)} placeholder="Ex : Recharge Digicel et Natcom Haiti" />
+                <input value={business} onChange={(e) => setBusiness(e.target.value)} />
 
                 <label>Lien web du business</label>
-                <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="Ex : https://monsite.com" />
+                <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://monsite.com" />
 
                 <label>Langue</label>
                 <select value={language} onChange={(e) => setLanguage(e.target.value)}>
@@ -233,7 +188,7 @@ const [generatedImage, setGeneratedImage] = useState("");
                 </select>
 
                 <button className="generateBtn" onClick={generate} disabled={loading}>
-                  {loading ? "Connexion IA..." : "✨ Générer avec l’IA"}
+                  {loading ? "Connexion IA..." : "✨ Générer le texte"}
                 </button>
               </div>
 
@@ -253,27 +208,25 @@ const [generatedImage, setGeneratedImage] = useState("");
                     </div>
 
                     <div className="imageAiSection">
-  <button className="generateImageBtn" onClick={generateImage}>
-    {imageLoading ? "Création image IA..." : "🎨 Générer une image IA"}
-  </button>
+                      <button className="generateImageBtn" onClick={generateImage} disabled={imageLoading}>
+                        {imageLoading ? "Création image IA..." : "🎨 Générer une image publicitaire IA"}
+                      </button>
 
-  {generatedImage && (
-    <img
-      className="generatedImage"
-      src={generatedImage}
-      alt="Publicité IA"
-    />
-  )}
-</div><div className="shareArea">
+                      {imageError && <p className="imageError">{imageError}</p>}
+
+                      {generatedImage && (
+                        <img className="generatedImage" src={generatedImage} alt="Publicité IA" />
+                      )}
+                    </div>
+
+                    <div className="shareArea">
                       <strong>Partager sur</strong>
                       <div className="shareButtons">
                         <a className="whatsapp" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">WhatsApp</a>
                         <a className="facebook" href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`} target="_blank" rel="noreferrer">Facebook</a>
                         <button className="instagram" onClick={() => copyText(result)}>Instagram</button>
                         <a className="telegram" href={`https://t.me/share/url?url=${siteUrl}&text=${shareText}`} target="_blank" rel="noreferrer">Telegram</a>
-                        <button className="more" onClick={() => copyText(result)}>Plus d’options</button>
                       </div>
-                      <small>Pour Instagram, le texte est copié. Colle-le ensuite dans ton post ou story.</small>
                     </div>
                   </>
                 )}
@@ -297,7 +250,6 @@ const [generatedImage, setGeneratedImage] = useState("");
                   {item.logo && <img src={item.logo} alt="logo" />}
                   <strong>{item.type}</strong>
                   <span>{item.business}</span>
-                  {item.website && <small>Site : {item.website}</small>}
                   <small>{item.language} • {item.date}</small>
                   <pre>{item.text}</pre>
                   <button onClick={() => copyText(item.text)}>Copier</button>
