@@ -1,6 +1,4 @@
-body {
-  background: red !important;
-}.installBanner {
+.installBanner {
   position: fixed;
   top: 14px;
   left: 50%;
