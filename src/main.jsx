@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./style.css";
 
 const API_URL = "https://ghostreach-ai-v2.onrender.com/generate";
+const SITE_URL = "https://ghostreach-ai.netlify.app";
 
 function App() {
   const [page, setPage] = useState("generator");
@@ -13,13 +14,14 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [logo, setLogo] = useState(null);
+
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem("copynova_history");
     return saved ? JSON.parse(saved) : [];
   });
 
-  function saveHistory(newItem) {
-    const updated = [newItem, ...history].slice(0, 20);
+  function saveHistory(item) {
+    const updated = [item, ...history].slice(0, 20);
     setHistory(updated);
     localStorage.setItem("copynova_history", JSON.stringify(updated));
   }
@@ -38,7 +40,7 @@ function App() {
 
     setLoading(true);
     setCopied(false);
-    setResult("⏳ Connexion à l’IA... cela peut prendre quelques secondes.");
+    setResult("⏳ Connexion à l’IA...");
 
     try {
       const response = await fetch(API_URL, {
@@ -48,13 +50,8 @@ function App() {
       });
 
       const data = await response.json();
+      const finalText = data.result || data.error || "Erreur serveur";
 
-      if (!response.ok) {
-        setResult("❌ Erreur IA : " + (data.result || data.error || "réessaie dans quelques secondes."));
-        return;
-      }
-
-      const finalText = data.result || "❌ Aucun texte généré. Réessaie.";
       setResult(finalText);
 
       saveHistory({
@@ -87,25 +84,44 @@ function App() {
   }
 
   const shareText = encodeURIComponent(result);
-  const siteUrl = encodeURIComponent("https://genuine-duckanoo-8d0894.netlify.app");
+  const siteUrl = encodeURIComponent(SITE_URL);
 
   return (
-    <div className="layout">
+    <div className="app">
       <aside className="sidebar">
-        <h2>CopyNova AI</h2>
-        <p>AI Content & Marketing Platform</p>
+        <div className="brand">
+          <div className="logoMark">✦</div>
+          <div>
+            <h2>CopyNova AI</h2>
+            <p>AI Content & Marketing Platform</p>
+          </div>
+        </div>
 
         <nav>
-          <span className={page === "generator" ? "active" : ""} onClick={() => setPage("generator")}>
+          <button className={page === "generator" ? "navActive" : ""} onClick={() => setPage("generator")}>
             ⚡ Générateur
-          </span>
-          <span>📊 Statistiques</span>
-          <span className={page === "history" ? "active" : ""} onClick={() => setPage("history")}>
+          </button>
+          <button>📊 Statistiques</button>
+          <button className={page === "history" ? "navActive" : ""} onClick={() => setPage("history")}>
             🕘 Historique
-          </span>
-          <span>💎 Premium</span>
-          <span>⚙️ Réglages</span>
+          </button>
+          <button>💎 Premium</button>
+          <button>⚙️ Réglages</button>
         </nav>
+
+        <div className="premiumBox">
+          <strong>👑 Passez Premium</strong>
+          <p>Débloquez plus de générations, contenus illimités et fonctionnalités avancées.</p>
+          <button>Découvrir</button>
+        </div>
+
+        <div className="userBox">
+          <div>U</div>
+          <span>
+            <strong>Utilisateur</strong>
+            <small>Gratuit</small>
+          </span>
+        </div>
       </aside>
 
       <main className="main">
@@ -115,96 +131,144 @@ function App() {
               <div>
                 <h1>Crée du contenu marketing puissant avec l’IA</h1>
                 <p>
-                  Génère des pubs Facebook, messages WhatsApp, scripts TikTok,
-                  slogans, hashtags et contenus sociaux en français ou en créole haïtien.
+                  Génère des pubs Facebook, messages WhatsApp, scripts TikTok, slogans,
+                  hashtags et contenus sociaux en français ou en créole haïtien.
                 </p>
               </div>
-              <button className="premium">Passer Premium</button>
+
+              <button className="premiumTop">👑 Passer Premium</button>
             </header>
 
-            <section className="stats">
-              <div>🚀 <strong>Rapide</strong><span>Contenu prêt à publier</span></div>
-              <div>🇭🇹 <strong>Bilingue</strong><span>Français & Kreyòl Ayisyen</span></div>
-              <div>📱 <strong>Mobile</strong><span>Optimisé téléphone</span></div>
+            <section className="statsGrid">
+              <div className="statCard">
+                <span>⚡</span>
+                <strong>Rapide</strong>
+                <p>Contenu prêt à publier</p>
+              </div>
+
+              <div className="statCard">
+                <span>HT</span>
+                <strong>Bilingue</strong>
+                <p>Français & Kreyòl Ayisyen</p>
+              </div>
+
+              <div className="statCard">
+                <span>📱</span>
+                <strong>Mobile</strong>
+                <p>Optimisé téléphone</p>
+              </div>
             </section>
 
-            <section className="card">
-              <h2>Créer un contenu</h2>
+            <section className="workspace">
+              <div className="panel">
+                <h2>✍️ Créer un contenu</h2>
 
-              <label>Logo du business</label>
-              <input type="file" accept="image/*" onChange={handleLogoUpload} />
+                <label>Logo du business</label>
+                <input type="file" accept="image/*" onChange={handleLogoUpload} />
 
-              {logo && (
-                <div className="logoPreview">
-                  <img src={logo} alt="Logo business" />
-                  <span>Logo ajouté à la publicité</span>
-                </div>
-              )}
-
-              <label>Nom ou idée du business</label>
-              <input
-                value={business}
-                onChange={(e) => setBusiness(e.target.value)}
-                placeholder="Ex : Recharge Digicel et Natcom Haiti"
-              />
-
-              <label>Langue</label>
-              <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-                <option>Français</option>
-                <option>Kreyòl Ayisyen</option>
-              </select>
-
-              <label>Type de contenu</label>
-              <select value={type} onChange={(e) => setType(e.target.value)}>
-                <option>Pub Facebook</option>
-                <option>Post Instagram</option>
-                <option>Message WhatsApp</option>
-                <option>Script TikTok</option>
-                <option>Script TikTok Viral</option>
-                <option>Message WhatsApp Business</option>
-                <option>Slogan Business Premium</option>
-                <option>Hashtags Instagram</option>
-                <option>Message Telegram</option>
-              </select>
-
-              <button onClick={generate} disabled={loading}>
-                {loading ? "Connexion IA..." : "Générer avec l’IA"}
-              </button>
-
-              {result && (
-                <div className="resultBox">
-                  {logo && <img className="resultLogo" src={logo} alt="Logo" />}
-                  <h3>Résultat généré</h3>
-                  <pre>{result}</pre>
-
-                  <button onClick={() => copyText()}>
-                    {copied ? "✅ Copié !" : "Copier le texte"}
-                  </button>
-
-                  <div className="shareButtons">
-                    <a href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
-                      📱 WhatsApp
-                    </a>
-                    <a href={`https://t.me/share/url?url=${siteUrl}&text=${shareText}`} target="_blank" rel="noreferrer">
-                      ✈️ Telegram
-                    </a>
-                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`} target="_blank" rel="noreferrer">
-                      📘 Facebook
-                    </a>
-                    <button onClick={() => copyText(result)}>🔗 Copier pour Instagram</button>
+                {logo && (
+                  <div className="logoPreview">
+                    <img src={logo} alt="Logo business" />
+                    <span>Logo ajouté à la publicité</span>
                   </div>
+                )}
+
+                <label>Nom ou idée du business</label>
+                <input
+                  value={business}
+                  onChange={(e) => setBusiness(e.target.value)}
+                  placeholder="Ex : Recharge Digicel et Natcom Haiti"
+                />
+
+                <label>Langue</label>
+                <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                  <option>Français</option>
+                  <option>Kreyòl Ayisyen</option>
+                </select>
+
+                <label>Type de contenu</label>
+                <select value={type} onChange={(e) => setType(e.target.value)}>
+                  <option>Pub Facebook</option>
+                  <option>Post Instagram</option>
+                  <option>Message WhatsApp</option>
+                  <option>Script TikTok</option>
+                  <option>Script TikTok Viral</option>
+                  <option>Message WhatsApp Business</option>
+                  <option>Slogan Business Premium</option>
+                  <option>Hashtags Instagram</option>
+                  <option>Message Telegram</option>
+                </select>
+
+                <button className="generateBtn" onClick={generate} disabled={loading}>
+                  {loading ? "Connexion IA..." : "✨ Générer avec l’IA"}
+                </button>
+              </div>
+
+              <div className="panel resultPanel">
+                <div className="resultHeader">
+                  <h2>✦ Résultat généré</h2>
+                  {result && (
+                    <button className="smallBtn" onClick={() => copyText()}>
+                      {copied ? "✅ Copié" : "📋 Copier le texte"}
+                    </button>
+                  )}
                 </div>
-              )}
+
+                {!result && (
+                  <div className="emptyState">
+                    <p>Ton contenu généré apparaîtra ici.</p>
+                  </div>
+                )}
+
+                {result && (
+                  <>
+                    <div className="generatedAd">
+                      {logo && <img className="resultLogo" src={logo} alt="Logo" />}
+                      <pre>{result}</pre>
+                    </div>
+
+                    <div className="shareArea">
+                      <strong>Partager sur</strong>
+
+                      <div className="shareButtons">
+                        <a className="whatsapp" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
+                          WhatsApp
+                        </a>
+
+                        <a className="facebook" href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`} target="_blank" rel="noreferrer">
+                          Facebook
+                        </a>
+
+                        <button className="instagram" onClick={() => copyText(result)}>
+                          Instagram
+                        </button>
+
+                        <a className="telegram" href={`https://t.me/share/url?url=${siteUrl}&text=${shareText}`} target="_blank" rel="noreferrer">
+                          Telegram
+                        </a>
+
+                        <button className="more" onClick={() => copyText(result)}>
+                          Plus d’options
+                        </button>
+                      </div>
+
+                      <small>Les liens de partage ouvriront l’application correspondante sur votre téléphone.</small>
+                    </div>
+                  </>
+                )}
+              </div>
             </section>
           </>
         )}
 
         {page === "history" && (
-          <section className="card">
-            <h2>Historique des générations</h2>
+          <section className="panel historyPanel">
+            <div className="resultHeader">
+              <h2>🕘 Historique des générations</h2>
+              {history.length > 0 && <button className="smallBtn" onClick={clearHistory}>Supprimer</button>}
+            </div>
 
-            {history.length > 0 && <button onClick={clearHistory}>Supprimer l’historique</button>}
-            {history.length === 0 && <p className="empty">Aucun contenu sauvegardé pour le moment.</p>}
+            {history.length === 0 && <p className="emptyText">Aucun contenu sauvegardé.</p>}
 
             <div className="historyList">
               {history.map((item) => (
@@ -221,9 +285,7 @@ function App() {
           </section>
         )}
 
-        <footer className="footer">
-          © 2026 CopyNova AI — Powered by Artificial Intelligence
-        </footer>
+        <footer>© 2026 CopyNova AI — Powered by Artificial Intelligence</footer>
       </main>
     </div>
   );
