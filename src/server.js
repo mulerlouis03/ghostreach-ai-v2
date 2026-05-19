@@ -6,6 +6,7 @@ import OpenAI from "openai";
 dotenv.config();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
@@ -15,41 +16,64 @@ const client = new OpenAI({
 
 app.post("/generate", async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { business, type } = req.body;
+
+    let prompt = "";
+
+    if (type === "Pub Facebook") {
+      prompt = `Crée une publicité Facebook ultra convaincante pour le business suivant : ${business}`;
+    }
+
+    if (type === "Post Instagram") {
+      prompt = `Crée un post Instagram viral pour : ${business}`;
+    }
+
+    if (type === "Message WhatsApp") {
+      prompt = `Crée un message WhatsApp marketing professionnel pour : ${business}`;
+    }
+
+    if (type === "Script TikTok") {
+      prompt = `Crée un script TikTok captivant pour : ${business}`;
+    }
+
+    if (type === "Script TikTok Viral") {
+      prompt = `Crée un script TikTok extrêmement viral avec hook puissant, émotion et appel à l'action pour : ${business}`;
+    }
+
+    if (type === "Message WhatsApp Business") {
+      prompt = `Crée un message WhatsApp Business premium pour convertir des clients pour : ${business}`;
+    }
+
+    if (type === "Slogan Business Premium") {
+      prompt = `Crée 10 slogans premium modernes et puissants pour : ${business}`;
+    }
+
+    if (type === "Hashtags Instagram") {
+      prompt = `Crée 20 hashtags Instagram viraux pour : ${business}`;
+    }
+
+    if (type === "Message Telegram") {
+      prompt = `Crée un message Telegram marketing très engageant pour : ${business}`;
+    }
 
     const completion = await client.chat.completions.create({
       model: "gpt-4.1-mini",
       messages: [
         {
           role: "user",
-          content: `content: `Tu es un expert mondial du marketing digital, du copywriting viral et des réseaux sociaux.
-
-Crée un contenu très professionnel, émotionnel et vendeur.
-
-Le contenu doit :
-- attirer immédiatement l’attention
-- donner envie d’acheter
-- utiliser un ton moderne
-- être optimisé pour Facebook, Instagram, TikTok et WhatsApp
-- utiliser des emojis intelligemment
-- être clair et très humain
-- écrire uniquement en français
-
-Business utilisateur :
-${prompt}
-
-Le texte doit être très puissant commercialement.
-`,
+          content: prompt,
         },
       ],
     });
 
-    res.json({
-      result: completion.choices[0].message.content,
-    });
+    const result = completion.choices[0].message.content;
+
+    res.json({ result });
+
   } catch (error) {
+    console.log(error);
     res.status(500).json({
-      error: error.message,
+      result: "Erreur serveur",
     });
   }
 });
@@ -57,5 +81,5 @@ Le texte doit être très puissant commercialement.
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log(`Serveur lancé sur le port ${PORT}`);
+  console.log("Serveur lancé sur port " + PORT);
 });

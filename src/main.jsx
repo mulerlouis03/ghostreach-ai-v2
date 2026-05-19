@@ -1,56 +1,51 @@
-import React, { useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import './style.css';
+import React, { useState } from "react";
+import ReactDOM from "react-dom/client";
+import "./style.css";
 
 function App() {
-  const [business, setBusiness] = useState('Recharge Digicel Haiti');
-  const [type, setType] = useState('Pub Facebook');
-  const [result, setResult] = useState('');
+  const [business, setBusiness] = useState("");
+  const [type, setType] = useState("Pub Facebook");
+  const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const generate = async () => {
+  async function generate() {
     setLoading(true);
-    setResult('⏳ Génération en cours...');
+    setResult("⏳ Génération en cours...");
 
     try {
       const response = await fetch("https://ghostreach-ai-v2.onrender.com/generate", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          prompt: `Business : ${business}. Type de contenu demandé : ${type}.`
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          business,
+          type,
         }),
       });
 
       const data = await response.json();
 
-      if (data.result) {
-        setResult(data.result);
-      } else {
-        setResult('Erreur : ' + JSON.stringify(data));
-      }
+      setResult(data.result);
     } catch (error) {
-      setResult('Erreur connexion serveur.');
+      setResult("❌ Erreur serveur");
     }
 
     setLoading(false);
-  };
-
-  const copyText = () => {
-    navigator.clipboard.writeText(result);
-    alert('Texte copié !');
-  };
+  }
 
   return (
-    <div className="app">
+    <div className="container">
       <h1>GhostReach AI</h1>
 
       <div className="card">
         <h2>Générateur IA Marketing</h2>
 
         <input
+          type="text"
+          placeholder="Nom du business"
           value={business}
           onChange={(e) => setBusiness(e.target.value)}
-          placeholder="Ton business"
         />
 
         <select value={type} onChange={(e) => setType(e.target.value)}>
@@ -59,25 +54,29 @@ function App() {
           <option>Message WhatsApp</option>
           <option>Script TikTok</option>
           <option>Script TikTok Viral</option>
-<option>Message WhatsApp Business</option>
-<option>Slogan Business Premium</option>
+          <option>Message WhatsApp Business</option>
+          <option>Slogan Business Premium</option>
           <option>Hashtags Instagram</option>
           <option>Message Telegram</option>
-        
+        </select>
 
         <button onClick={generate} disabled={loading}>
-          {loading ? 'Génération...' : 'Générer'}
+          {loading ? "Génération..." : "Générer"}
         </button>
 
-        {result && (
-          <>
-            <pre>{result}</pre>
-            <button onClick={copyText}>Copier le texte</button>
-          </>
-        )}
+        <div className="result">
+          {result}
+        </div>
+
+        <button
+          className="copy-btn"
+          onClick={() => navigator.clipboard.writeText(result)}
+        >
+          Copier le texte
+        </button>
       </div>
     </div>
   );
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
