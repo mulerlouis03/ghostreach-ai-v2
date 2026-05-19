@@ -22,7 +22,24 @@ app.post("/generate", async (req, res) => {
       messages: [
         {
           role: "user",
-          content: `Réponds uniquement en français. Crée une publicité marketing claire et attractive pour : ${prompt}`,
+          content: `content: `Tu es un expert mondial du marketing digital, du copywriting viral et des réseaux sociaux.
+
+Crée un contenu très professionnel, émotionnel et vendeur.
+
+Le contenu doit :
+- attirer immédiatement l’attention
+- donner envie d’acheter
+- utiliser un ton moderne
+- être optimisé pour Facebook, Instagram, TikTok et WhatsApp
+- utiliser des emojis intelligemment
+- être clair et très humain
+- écrire uniquement en français
+
+Business utilisateur :
+${prompt}
+
+Le texte doit être très puissant commercialement.
+`,
         },
       ],
     });

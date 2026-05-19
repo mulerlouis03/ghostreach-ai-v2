@@ -58,9 +58,12 @@ function App() {
           <option>Post Instagram</option>
           <option>Message WhatsApp</option>
           <option>Script TikTok</option>
+          <option>Script TikTok Viral</option>
+<option>Message WhatsApp Business</option>
+<option>Slogan Business Premium</option>
           <option>Hashtags Instagram</option>
           <option>Message Telegram</option>
-        </select>
+        
 
         <button onClick={generate} disabled={loading}>
           {loading ? 'Génération...' : 'Générer'}
