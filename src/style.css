@@ -17,8 +17,8 @@ body {
 
 .sidebar {
   width: 260px;
-  padding: 28px;
-  background: rgba(2, 6, 23, 0.9);
+  padding: 26px;
+  background: rgba(2, 6, 23, 0.92);
   border-right: 1px solid rgba(125, 211, 252, 0.15);
 }
 
@@ -44,8 +44,10 @@ body {
   padding: 13px 15px;
   border-radius: 14px;
   color: #cbd5e1;
+  cursor: pointer;
 }
 
+.sidebar span:hover,
 .sidebar .active {
   background: rgba(14, 165, 233, 0.2);
   color: white;
@@ -76,9 +78,7 @@ body {
   line-height: 1.6;
 }
 
-.premium,
-.card button,
-.resultBox button {
+button {
   border: none;
   padding: 15px 22px;
   border-radius: 16px;
@@ -87,6 +87,11 @@ body {
   font-size: 16px;
   background: linear-gradient(135deg, #06b6d4, #2563eb);
   cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .stats {
@@ -115,7 +120,7 @@ body {
 }
 
 .card {
-  max-width: 900px;
+  max-width: 940px;
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(125, 211, 252, 0.2);
   border-radius: 28px;
@@ -144,6 +149,34 @@ select {
   font-size: 17px;
 }
 
+input[type="file"] {
+  padding: 14px;
+}
+
+.logoPreview {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(2, 6, 23, 0.8);
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.logoPreview img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: white;
+  padding: 6px;
+}
+
+.logoPreview span {
+  color: #cbd5e1;
+}
+
 .card button {
   margin-top: 22px;
 }
@@ -156,11 +189,65 @@ select {
   padding: 22px;
 }
 
+.resultLogo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  background: white;
+  border-radius: 18px;
+  padding: 8px;
+  margin-bottom: 14px;
+}
+
 pre {
   white-space: pre-wrap;
   line-height: 1.7;
   font-size: 16px;
   color: #e2e8f0;
+}
+
+.historyList {
+  margin-top: 24px;
+  display: grid;
+  gap: 18px;
+}
+
+.historyItem {
+  background: #020617;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 22px;
+  padding: 20px;
+}
+
+.historyItem img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  background: white;
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 10px;
+}
+
+.historyItem strong {
+  display: block;
+  color: #7dd3fc;
+  font-size: 18px;
+}
+
+.historyItem span {
+  display: block;
+  color: #cbd5e1;
+  margin: 6px 0;
+}
+
+.historyItem small {
+  color: #94a3b8;
+}
+
+.empty {
+  color: #94a3b8;
+  margin-top: 20px;
 }
 
 .footer {
@@ -178,7 +265,7 @@ pre {
 
   .sidebar {
     width: 100%;
-    padding: 20px;
+    padding: 18px;
     border-right: none;
     border-bottom: 1px solid rgba(125, 211, 252, 0.15);
   }
@@ -187,15 +274,11 @@ pre {
     font-size: 24px;
   }
 
-  .sidebar p {
-    margin-bottom: 14px;
-  }
-
   .sidebar nav {
     flex-direction: row;
     overflow-x: auto;
     gap: 10px;
-    padding-bottom: 6px;
+    padding-bottom: 8px;
   }
 
   .sidebar span {
@@ -205,7 +288,7 @@ pre {
   }
 
   .main {
-    padding: 20px;
+    padding: 18px;
   }
 
   .hero {
@@ -231,17 +314,13 @@ pre {
     gap: 12px;
   }
 
-  .stats div {
-    padding: 16px;
-  }
-
   .card {
-    padding: 22px;
+    padding: 20px;
     border-radius: 24px;
   }
 
   .card h2 {
-    font-size: 25px;
+    font-size: 24px;
   }
 
   input,
@@ -250,13 +329,12 @@ pre {
     padding: 15px;
   }
 
-  .card button,
-  .resultBox button {
+  button {
     width: 100%;
   }
 
-  .resultBox {
-    padding: 18px;
+  .logoPreview {
+    align-items: flex-start;
   }
 
   pre {
