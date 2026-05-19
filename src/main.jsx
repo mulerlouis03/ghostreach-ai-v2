@@ -13,7 +13,7 @@ function App() {
     setResult('⏳ Génération en cours...');
 
     try {
-      const response = await fetch('https://ghostreach-ai.onrender.com/generate', {
+      const response = await fetch("https://ghostreach-ai-v2.onrender.com/generate", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
