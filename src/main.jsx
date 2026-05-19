@@ -36,8 +36,8 @@ function App() {
   return (
     <div className="layout">
       <aside className="sidebar">
-        <h2>GhostReach</h2>
-        <p>AI Marketing Studio</p>
+        <h2>CopyNova AI</h2>
+        <p>AI Content & Marketing Platform</p>
 
         <nav>
           <span className="active">⚡ Générateur</span>
@@ -51,8 +51,11 @@ function App() {
       <main className="main">
         <header className="hero">
           <div>
-            <h1>Génère du contenu marketing avec l’IA</h1>
-            <p>Crée des pubs, messages WhatsApp, scripts TikTok et slogans en quelques secondes.</p>
+            <h1>Crée du contenu marketing puissant avec l’IA</h1>
+            <p>
+              CopyNova AI génère des pubs Facebook, messages WhatsApp,
+              scripts TikTok, slogans et contenus sociaux en quelques secondes.
+            </p>
           </div>
           <button className="premium">Passer Premium</button>
         </header>
@@ -67,7 +70,11 @@ function App() {
           <h2>Créer un contenu</h2>
 
           <label>Nom du business</label>
-          <input value={business} onChange={(e) => setBusiness(e.target.value)} />
+          <input
+            value={business}
+            onChange={(e) => setBusiness(e.target.value)}
+            placeholder="Ex : salon de coiffure, recharge mobile, boutique..."
+          />
 
           <label>Type de contenu</label>
           <select value={type} onChange={(e) => setType(e.target.value)}>
@@ -94,6 +101,10 @@ function App() {
             </div>
           )}
         </section>
+
+        <footer className="footer">
+          © 2026 CopyNova AI — Powered by Artificial Intelligence
+        </footer>
       </main>
     </div>
   );
