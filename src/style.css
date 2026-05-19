@@ -547,4 +547,25 @@ footer {
     flex-direction: column;
     align-items: stretch;
   }
+}.imageAiSection {
+  margin-top: 24px;
+}
+
+.generateImageBtn {
+  width: 100%;
+  border: none;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.generatedImage {
+  width: 100%;
+  margin-top: 18px;
+  border-radius: 24px;
+  border: 1px solid #dbeafe;
 }

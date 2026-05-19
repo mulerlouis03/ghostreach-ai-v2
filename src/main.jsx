@@ -14,7 +14,8 @@ function App() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [logo, setLogo] = useState(null);
+  const [logo, setLogo] = useState(null);const [imageLoading, setImageLoading] = useState(false);
+const [generatedImage, setGeneratedImage] = useState("");
   const [installPrompt, setInstallPrompt] = useState(null);
   const [showInstall, setShowInstall] = useState(true);
 
@@ -92,7 +93,35 @@ function App() {
     }
   }
 
-  async function copyText(text = result) {
+  async function generateImage() {
+  setImageLoading(true);
+
+  try {
+    const response = await fetch(
+      "https://ghostreach-ai-v2.onrender.com/generate-image",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          business,
+          type,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.image) {
+      setGeneratedImage(data.image);
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setImageLoading(false);
+  }
+}async function copyText(text = result) {
     if (!text) return;
     await navigator.clipboard.writeText(text);
     setCopied(true);
@@ -223,7 +252,19 @@ function App() {
                       <pre>{result}</pre>
                     </div>
 
-                    <div className="shareArea">
+                    <div className="imageAiSection">
+  <button className="generateImageBtn" onClick={generateImage}>
+    {imageLoading ? "Création image IA..." : "🎨 Générer une image IA"}
+  </button>
+
+  {generatedImage && (
+    <img
+      className="generatedImage"
+      src={generatedImage}
+      alt="Publicité IA"
+    />
+  )}
+</div><div className="shareArea">
                       <strong>Partager sur</strong>
                       <div className="shareButtons">
                         <a className="whatsapp" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">WhatsApp</a>

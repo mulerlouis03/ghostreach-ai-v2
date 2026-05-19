@@ -20,15 +20,15 @@ app.post("/generate", async (req, res) => {
 
     const languageInstruction =
       language === "Kreyòl Ayisyen"
-        ? "Écris uniquement en créole haïtien naturel, clair, vendeur et facile à comprendre en Haïti."
-        : "Écris uniquement en français naturel, professionnel et vendeur.";
+        ? "Écris uniquement en créole haïtien naturel, vendeur et moderne."
+        : "Écris uniquement en français naturel, moderne et vendeur.";
 
     const websiteInstruction = website
-      ? `Lien web du business à intégrer intelligemment si utile : ${website}`
-      : "Aucun lien web fourni.";
+      ? `Ajoute ce lien intelligemment : ${website}`
+      : "";
 
     const prompt = `
-Tu es un expert mondial en marketing digital, publicité, copywriting viral et vente sur les réseaux sociaux.
+Tu es un expert mondial du marketing digital.
 
 ${languageInstruction}
 
@@ -37,17 +37,15 @@ ${business}
 
 ${websiteInstruction}
 
-Type de contenu demandé :
+Type :
 ${type}
 
-Règles importantes :
-- Si un lien web est fourni, ajoute-le naturellement comme appel à l'action.
-- Mentionne Digicel ET Natcom seulement si le business parle de recharge mobile.
-- Ne force jamais Digicel si l'utilisateur demande Natcom.
-- Sois moderne, humain, convaincant et simple.
-- Utilise des emojis avec intelligence.
-- Ajoute un appel à l'action clair.
-- Le texte doit être prêt à publier.
+Règles :
+- Sois vendeur
+- Moderne
+- Utilise emojis intelligemment
+- Fais un appel à l'action
+- Texte prêt à publier
 `;
 
     const completion = await client.chat.completions.create({
@@ -55,11 +53,57 @@ Règles importantes :
       messages: [{ role: "user", content: prompt }],
     });
 
-    res.json({ result: completion.choices[0].message.content });
+    res.json({
+      result: completion.choices[0].message.content,
+    });
   } catch (error) {
     console.log(error);
+
     res.status(500).json({
-      result: "Erreur serveur",
+      error: error.message,
+    });
+  }
+});
+
+app.post("/generate-image", async (req, res) => {
+  try {
+    const { business, type } = req.body;
+
+    const imagePrompt = `
+Create a premium social media advertising poster for:
+
+${business}
+
+Style:
+- modern marketing
+- ultra realistic
+- social media ad
+- vibrant colors
+- luxury branding
+- high quality
+- professional lighting
+- mobile marketing style
+- add marketing visual effects
+
+Content type:
+${type}
+
+Make it look like a real Facebook/Instagram advertisement.
+`;
+
+    const image = await client.images.generate({
+      model: "gpt-image-1",
+      prompt: imagePrompt,
+      size: "1024x1024",
+    });
+
+    res.json({
+      image: image.data[0].url,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
       error: error.message,
     });
   }
