@@ -98,8 +98,8 @@ Make it look like a real Facebook/Instagram advertisement.
     });
 
     res.json({
-      image: image.data[0].url,
-    });
+  image: `data:image/png;base64,${image.data[0].b64_json}`,
+});
   } catch (error) {
     console.log(error);
 
