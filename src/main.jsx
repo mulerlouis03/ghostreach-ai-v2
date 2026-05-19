@@ -8,6 +8,7 @@ function App() {
   const [page, setPage] = useState("generator");
   const [business, setBusiness] = useState("Recharge Digicel et Natcom Haiti");
   const [type, setType] = useState("Pub Facebook");
+  const [language, setLanguage] = useState("Français");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -26,9 +27,7 @@ function App() {
   function handleLogoUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
-
-    const logoUrl = URL.createObjectURL(file);
-    setLogo(logoUrl);
+    setLogo(URL.createObjectURL(file));
   }
 
   async function generate() {
@@ -44,13 +43,8 @@ function App() {
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          business: business.trim(),
-          type
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ business: business.trim(), type, language })
       });
 
       const data = await response.json();
@@ -67,11 +61,12 @@ function App() {
         id: Date.now(),
         business,
         type,
+        language,
         text: finalText,
         logo,
         date: new Date().toLocaleString()
       });
-    } catch (error) {
+    } catch {
       setResult("❌ Impossible de contacter l’IA. Attends 30 secondes puis réessaie.");
     } finally {
       setLoading(false);
@@ -80,13 +75,9 @@ function App() {
 
   async function copyText(text = result) {
     if (!text) return;
-
     await navigator.clipboard.writeText(text);
     setCopied(true);
-
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   function clearHistory() {
@@ -102,22 +93,13 @@ function App() {
         <p>AI Content & Marketing Platform</p>
 
         <nav>
-          <span
-            className={page === "generator" ? "active" : ""}
-            onClick={() => setPage("generator")}
-          >
+          <span className={page === "generator" ? "active" : ""} onClick={() => setPage("generator")}>
             ⚡ Générateur
           </span>
-
           <span>📊 Statistiques</span>
-
-          <span
-            className={page === "history" ? "active" : ""}
-            onClick={() => setPage("history")}
-          >
+          <span className={page === "history" ? "active" : ""} onClick={() => setPage("history")}>
             🕘 Historique
           </span>
-
           <span>💎 Premium</span>
           <span>⚙️ Réglages</span>
         </nav>
@@ -131,28 +113,16 @@ function App() {
                 <h1>Crée du contenu marketing puissant avec l’IA</h1>
                 <p>
                   Génère des pubs Facebook, messages WhatsApp, scripts TikTok,
-                  slogans, hashtags et contenus sociaux en quelques secondes.
+                  slogans, hashtags et contenus sociaux en français ou en créole haïtien.
                 </p>
               </div>
-
               <button className="premium">Passer Premium</button>
             </header>
 
             <section className="stats">
-              <div>
-                🚀 <strong>Rapide</strong>
-                <span>Contenu prêt à publier</span>
-              </div>
-
-              <div>
-                🇫🇷 <strong>Français</strong>
-                <span>Textes naturels et vendeurs</span>
-              </div>
-
-              <div>
-                📱 <strong>Mobile</strong>
-                <span>Utilisable depuis ton téléphone</span>
-              </div>
+              <div>🚀 <strong>Rapide</strong><span>Contenu prêt à publier</span></div>
+              <div>🇭🇹 <strong>Bilingue</strong><span>Français & Kreyòl Ayisyen</span></div>
+              <div>📱 <strong>Mobile</strong><span>Optimisé téléphone</span></div>
             </section>
 
             <section className="card">
@@ -174,6 +144,12 @@ function App() {
                 onChange={(e) => setBusiness(e.target.value)}
                 placeholder="Ex : Recharge Digicel et Natcom Haiti"
               />
+
+              <label>Langue</label>
+              <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                <option>Français</option>
+                <option>Kreyòl Ayisyen</option>
+              </select>
 
               <label>Type de contenu</label>
               <select value={type} onChange={(e) => setType(e.target.value)}>
@@ -197,7 +173,6 @@ function App() {
                   {logo && <img className="resultLogo" src={logo} alt="Logo" />}
                   <h3>Résultat généré</h3>
                   <pre>{result}</pre>
-
                   <button onClick={() => copyText()}>
                     {copied ? "✅ Copié !" : "Copier le texte"}
                   </button>
@@ -211,13 +186,8 @@ function App() {
           <section className="card">
             <h2>Historique des générations</h2>
 
-            {history.length > 0 && (
-              <button onClick={clearHistory}>Supprimer l’historique</button>
-            )}
-
-            {history.length === 0 && (
-              <p className="empty">Aucun contenu sauvegardé pour le moment.</p>
-            )}
+            {history.length > 0 && <button onClick={clearHistory}>Supprimer l’historique</button>}
+            {history.length === 0 && <p className="empty">Aucun contenu sauvegardé pour le moment.</p>}
 
             <div className="historyList">
               {history.map((item) => (
@@ -225,7 +195,7 @@ function App() {
                   {item.logo && <img src={item.logo} alt="logo" />}
                   <strong>{item.type}</strong>
                   <span>{item.business}</span>
-                  <small>{item.date}</small>
+                  <small>{item.language} • {item.date}</small>
                   <pre>{item.text}</pre>
                   <button onClick={() => copyText(item.text)}>Copier</button>
                 </div>

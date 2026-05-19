@@ -5,31 +5,34 @@
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
-  background: #050816;
-  color: white;
+  background: #eef6ff;
+  color: #0f172a;
 }
 
 .layout {
   min-height: 100vh;
   display: flex;
-  background: linear-gradient(135deg, #020617, #0f172a);
+  background:
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.28), transparent 32%),
+    linear-gradient(135deg, #f8fbff, #e0f2fe);
 }
 
 .sidebar {
   width: 260px;
   padding: 26px;
-  background: rgba(2, 6, 23, 0.92);
-  border-right: 1px solid rgba(125, 211, 252, 0.15);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px);
+  border-right: 1px solid rgba(14, 165, 233, 0.18);
 }
 
 .sidebar h2 {
   margin: 0;
   font-size: 26px;
-  color: #7dd3fc;
+  color: #0369a1;
 }
 
 .sidebar p {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 14px;
 }
 
@@ -43,14 +46,14 @@ body {
 .sidebar span {
   padding: 13px 15px;
   border-radius: 14px;
-  color: #cbd5e1;
+  color: #334155;
   cursor: pointer;
 }
 
 .sidebar span:hover,
 .sidebar .active {
-  background: rgba(14, 165, 233, 0.2);
-  color: white;
+  background: rgba(14, 165, 233, 0.14);
+  color: #0369a1;
 }
 
 .main {
@@ -70,10 +73,11 @@ body {
   font-size: 42px;
   margin: 0 0 12px;
   max-width: 760px;
+  color: #0f172a;
 }
 
 .hero p {
-  color: #94a3b8;
+  color: #475569;
   font-size: 17px;
   line-height: 1.6;
 }
@@ -87,6 +91,7 @@ button {
   font-size: 16px;
   background: linear-gradient(135deg, #06b6d4, #2563eb);
   cursor: pointer;
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
 }
 
 button:disabled {
@@ -102,40 +107,45 @@ button:disabled {
 }
 
 .stats div {
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(125, 211, 252, 0.18);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(14, 165, 233, 0.16);
   border-radius: 22px;
   padding: 20px;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
 }
 
 .stats strong {
   display: block;
   margin: 8px 0;
   font-size: 19px;
+  color: #0f172a;
 }
 
 .stats span {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 14px;
 }
 
 .card {
   max-width: 940px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(125, 211, 252, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(14, 165, 233, 0.18);
   border-radius: 28px;
   padding: 30px;
+  box-shadow: 0 25px 80px rgba(15, 23, 42, 0.08);
 }
 
 .card h2 {
   margin-top: 0;
   font-size: 30px;
+  color: #0f172a;
 }
 
 label {
   display: block;
   margin: 18px 0 8px;
-  color: #cbd5e1;
+  color: #334155;
+  font-weight: 600;
 }
 
 input,
@@ -143,9 +153,9 @@ select {
   width: 100%;
   padding: 17px;
   border-radius: 16px;
-  border: 1px solid rgba(125, 211, 252, 0.25);
-  background: #020617;
-  color: white;
+  border: 1px solid rgba(14, 165, 233, 0.24);
+  background: #f8fafc;
+  color: #0f172a;
   font-size: 17px;
 }
 
@@ -158,23 +168,29 @@ input[type="file"] {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: rgba(2, 6, 23, 0.8);
-  border: 1px solid rgba(125, 211, 252, 0.18);
+  background: #f8fafc;
+  border: 1px solid rgba(14, 165, 233, 0.16);
   border-radius: 18px;
   padding: 14px;
+}
+
+.logoPreview img,
+.resultLogo,
+.historyItem img {
+  object-fit: contain;
+  background: white;
+  border-radius: 14px;
+  padding: 6px;
+  border: 1px solid #e2e8f0;
 }
 
 .logoPreview img {
   width: 58px;
   height: 58px;
-  object-fit: contain;
-  border-radius: 14px;
-  background: white;
-  padding: 6px;
 }
 
 .logoPreview span {
-  color: #cbd5e1;
+  color: #475569;
 }
 
 .card button {
@@ -183,8 +199,8 @@ input[type="file"] {
 
 .resultBox {
   margin-top: 28px;
-  background: #020617;
-  border: 1px solid rgba(125, 211, 252, 0.2);
+  background: #f8fafc;
+  border: 1px solid rgba(14, 165, 233, 0.18);
   border-radius: 22px;
   padding: 22px;
 }
@@ -192,10 +208,6 @@ input[type="file"] {
 .resultLogo {
   width: 72px;
   height: 72px;
-  object-fit: contain;
-  background: white;
-  border-radius: 18px;
-  padding: 8px;
   margin-bottom: 14px;
 }
 
@@ -203,7 +215,7 @@ pre {
   white-space: pre-wrap;
   line-height: 1.7;
   font-size: 16px;
-  color: #e2e8f0;
+  color: #1e293b;
 }
 
 .historyList {
@@ -213,8 +225,8 @@ pre {
 }
 
 .historyItem {
-  background: #020617;
-  border: 1px solid rgba(125, 211, 252, 0.18);
+  background: #f8fafc;
+  border: 1px solid rgba(14, 165, 233, 0.16);
   border-radius: 22px;
   padding: 20px;
 }
@@ -222,37 +234,29 @@ pre {
 .historyItem img {
   width: 54px;
   height: 54px;
-  object-fit: contain;
-  background: white;
-  border-radius: 14px;
-  padding: 6px;
   margin-bottom: 10px;
 }
 
 .historyItem strong {
   display: block;
-  color: #7dd3fc;
+  color: #0369a1;
   font-size: 18px;
 }
 
 .historyItem span {
   display: block;
-  color: #cbd5e1;
+  color: #334155;
   margin: 6px 0;
 }
 
-.historyItem small {
-  color: #94a3b8;
-}
-
-.empty {
-  color: #94a3b8;
-  margin-top: 20px;
+.historyItem small,
+.empty,
+.footer {
+  color: #64748b;
 }
 
 .footer {
   margin-top: 35px;
-  color: #94a3b8;
   text-align: center;
   font-size: 14px;
 }
@@ -267,7 +271,7 @@ pre {
     width: 100%;
     padding: 18px;
     border-right: none;
-    border-bottom: 1px solid rgba(125, 211, 252, 0.15);
+    border-bottom: 1px solid rgba(14, 165, 233, 0.15);
   }
 
   .sidebar h2 {
@@ -288,7 +292,7 @@ pre {
   }
 
   .main {
-    padding: 18px;
+    padding: 16px;
   }
 
   .hero {
@@ -296,8 +300,8 @@ pre {
   }
 
   .hero h1 {
-    font-size: 30px;
-    line-height: 1.15;
+    font-size: 29px;
+    line-height: 1.16;
   }
 
   .hero p {
@@ -315,7 +319,7 @@ pre {
   }
 
   .card {
-    padding: 20px;
+    padding: 19px;
     border-radius: 24px;
   }
 

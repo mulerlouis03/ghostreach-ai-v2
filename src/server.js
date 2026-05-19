@@ -16,64 +16,51 @@ const client = new OpenAI({
 
 app.post("/generate", async (req, res) => {
   try {
-    const { business, type } = req.body;
+    const { business, type, language } = req.body;
 
-    let prompt = "";
+    const languageInstruction =
+      language === "Kreyòl Ayisyen"
+        ? "Écris uniquement en créole haïtien naturel, clair, vendeur et facile à comprendre en Haïti."
+        : "Écris uniquement en français naturel, professionnel et vendeur.";
 
-    if (type === "Pub Facebook") {
-      prompt = `Crée une publicité Facebook ultra convaincante pour le business suivant : ${business}`;
-    }
+    const baseInstruction = `
+Tu es un expert mondial en marketing digital, publicité, copywriting viral et vente sur les réseaux sociaux.
 
-    if (type === "Post Instagram") {
-      prompt = `Crée un post Instagram viral pour : ${business}`;
-    }
+${languageInstruction}
 
-    if (type === "Message WhatsApp") {
-      prompt = `Crée un message WhatsApp marketing professionnel pour : ${business}`;
-    }
+Business :
+${business}
 
-    if (type === "Script TikTok") {
-      prompt = `Crée un script TikTok captivant pour : ${business}`;
-    }
+Type de contenu demandé :
+${type}
 
-    if (type === "Script TikTok Viral") {
-      prompt = `Crée un script TikTok extrêmement viral avec hook puissant, émotion et appel à l'action pour : ${business}`;
-    }
-
-    if (type === "Message WhatsApp Business") {
-      prompt = `Crée un message WhatsApp Business premium pour convertir des clients pour : ${business}`;
-    }
-
-    if (type === "Slogan Business Premium") {
-      prompt = `Crée 10 slogans premium modernes et puissants pour : ${business}`;
-    }
-
-    if (type === "Hashtags Instagram") {
-      prompt = `Crée 20 hashtags Instagram viraux pour : ${business}`;
-    }
-
-    if (type === "Message Telegram") {
-      prompt = `Crée un message Telegram marketing très engageant pour : ${business}`;
-    }
+Important :
+- Mentionne Digicel ET Natcom seulement si le business parle de recharge mobile.
+- Ne force jamais Digicel si l'utilisateur demande Natcom.
+- Sois moderne, humain, convaincant et simple.
+- Utilise des emojis avec intelligence.
+- Ajoute un appel à l'action clair.
+- Le texte doit être prêt à publier.
+`;
 
     const completion = await client.chat.completions.create({
       model: "gpt-4.1-mini",
       messages: [
         {
           role: "user",
-          content: prompt,
+          content: baseInstruction,
         },
       ],
     });
 
-    const result = completion.choices[0].message.content;
-
-    res.json({ result });
-
+    res.json({
+      result: completion.choices[0].message.content,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       result: "Erreur serveur",
+      error: error.message,
     });
   }
 });
