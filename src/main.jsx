@@ -44,7 +44,7 @@ function App() {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ business: business.trim(), type, language })
+        body: JSON.stringify({ business: business.trim(), type, language }),
       });
 
       const data = await response.json();
@@ -64,7 +64,7 @@ function App() {
         language,
         text: finalText,
         logo,
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
       });
     } catch {
       setResult("❌ Impossible de contacter l’IA. Attends 30 secondes puis réessaie.");
@@ -85,6 +85,9 @@ function App() {
     setHistory([]);
     localStorage.removeItem("copynova_history");
   }
+
+  const shareText = encodeURIComponent(result);
+  const siteUrl = encodeURIComponent("https://genuine-duckanoo-8d0894.netlify.app");
 
   return (
     <div className="layout">
@@ -173,9 +176,23 @@ function App() {
                   {logo && <img className="resultLogo" src={logo} alt="Logo" />}
                   <h3>Résultat généré</h3>
                   <pre>{result}</pre>
+
                   <button onClick={() => copyText()}>
                     {copied ? "✅ Copié !" : "Copier le texte"}
                   </button>
+
+                  <div className="shareButtons">
+                    <a href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
+                      📱 WhatsApp
+                    </a>
+                    <a href={`https://t.me/share/url?url=${siteUrl}&text=${shareText}`} target="_blank" rel="noreferrer">
+                      ✈️ Telegram
+                    </a>
+                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`} target="_blank" rel="noreferrer">
+                      📘 Facebook
+                    </a>
+                    <button onClick={() => copyText(result)}>🔗 Copier pour Instagram</button>
+                  </div>
                 </div>
               )}
             </section>
