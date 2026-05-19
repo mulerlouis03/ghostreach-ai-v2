@@ -16,14 +16,18 @@ const client = new OpenAI({
 
 app.post("/generate", async (req, res) => {
   try {
-    const { business, type, language } = req.body;
+    const { business, website, type, language } = req.body;
 
     const languageInstruction =
       language === "Kreyòl Ayisyen"
         ? "Écris uniquement en créole haïtien naturel, clair, vendeur et facile à comprendre en Haïti."
         : "Écris uniquement en français naturel, professionnel et vendeur.";
 
-    const baseInstruction = `
+    const websiteInstruction = website
+      ? `Lien web du business à intégrer intelligemment si utile : ${website}`
+      : "Aucun lien web fourni.";
+
+    const prompt = `
 Tu es un expert mondial en marketing digital, publicité, copywriting viral et vente sur les réseaux sociaux.
 
 ${languageInstruction}
@@ -31,10 +35,13 @@ ${languageInstruction}
 Business :
 ${business}
 
+${websiteInstruction}
+
 Type de contenu demandé :
 ${type}
 
-Important :
+Règles importantes :
+- Si un lien web est fourni, ajoute-le naturellement comme appel à l'action.
 - Mentionne Digicel ET Natcom seulement si le business parle de recharge mobile.
 - Ne force jamais Digicel si l'utilisateur demande Natcom.
 - Sois moderne, humain, convaincant et simple.
@@ -45,17 +52,10 @@ Important :
 
     const completion = await client.chat.completions.create({
       model: "gpt-4.1-mini",
-      messages: [
-        {
-          role: "user",
-          content: baseInstruction,
-        },
-      ],
+      messages: [{ role: "user", content: prompt }],
     });
 
-    res.json({
-      result: completion.choices[0].message.content,
-    });
+    res.json({ result: completion.choices[0].message.content });
   } catch (error) {
     console.log(error);
     res.status(500).json({

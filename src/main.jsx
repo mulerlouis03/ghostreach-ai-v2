@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./style.css";
 
@@ -8,17 +8,27 @@ const SITE_URL = "https://ghostreach-ai.netlify.app";
 function App() {
   const [page, setPage] = useState("generator");
   const [business, setBusiness] = useState("Recharge Digicel et Natcom Haiti");
+  const [website, setWebsite] = useState("");
   const [type, setType] = useState("Pub Facebook");
   const [language, setLanguage] = useState("Français");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [logo, setLogo] = useState(null);
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [showInstall, setShowInstall] = useState(true);
 
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem("copynova_history");
     return saved ? JSON.parse(saved) : [];
   });
+
+  useEffect(() => {
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    });
+  }, []);
 
   function saveHistory(item) {
     const updated = [item, ...history].slice(0, 20);
@@ -30,6 +40,17 @@ function App() {
     const file = e.target.files[0];
     if (!file) return;
     setLogo(URL.createObjectURL(file));
+  }
+
+  async function installApp() {
+    if (installPrompt) {
+      installPrompt.prompt();
+      await installPrompt.userChoice;
+      setInstallPrompt(null);
+      setShowInstall(false);
+    } else {
+      alert("Sur iPhone : appuie sur Partager, puis “Sur l’écran d’accueil”.");
+    }
   }
 
   async function generate() {
@@ -46,7 +67,7 @@ function App() {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ business: business.trim(), type, language }),
+        body: JSON.stringify({ business: business.trim(), website, type, language }),
       });
 
       const data = await response.json();
@@ -57,6 +78,7 @@ function App() {
       saveHistory({
         id: Date.now(),
         business,
+        website,
         type,
         language,
         text: finalText,
@@ -88,6 +110,14 @@ function App() {
 
   return (
     <div className="app">
+      {showInstall && (
+        <div className="installBanner">
+          <span>📲 Installe CopyNova AI sur ton téléphone</span>
+          <button onClick={installApp}>Installer</button>
+          <button className="closeInstall" onClick={() => setShowInstall(false)}>×</button>
+        </div>
+      )}
+
       <aside className="sidebar">
         <div className="brand">
           <div className="logoMark">✦</div>
@@ -98,13 +128,9 @@ function App() {
         </div>
 
         <nav>
-          <button className={page === "generator" ? "navActive" : ""} onClick={() => setPage("generator")}>
-            ⚡ Générateur
-          </button>
+          <button className={page === "generator" ? "navActive" : ""} onClick={() => setPage("generator")}>⚡ Générateur</button>
           <button>📊 Statistiques</button>
-          <button className={page === "history" ? "navActive" : ""} onClick={() => setPage("history")}>
-            🕘 Historique
-          </button>
+          <button className={page === "history" ? "navActive" : ""} onClick={() => setPage("history")}>🕘 Historique</button>
           <button>💎 Premium</button>
           <button>⚙️ Réglages</button>
         </nav>
@@ -117,10 +143,7 @@ function App() {
 
         <div className="userBox">
           <div>U</div>
-          <span>
-            <strong>Utilisateur</strong>
-            <small>Gratuit</small>
-          </span>
+          <span><strong>Utilisateur</strong><small>Gratuit</small></span>
         </div>
       </aside>
 
@@ -130,33 +153,15 @@ function App() {
             <header className="hero">
               <div>
                 <h1>Crée du contenu marketing puissant avec l’IA</h1>
-                <p>
-                  Génère des pubs Facebook, messages WhatsApp, scripts TikTok, slogans,
-                  hashtags et contenus sociaux en français ou en créole haïtien.
-                </p>
+                <p>Génère des pubs Facebook, messages WhatsApp, scripts TikTok, slogans et contenus sociaux en français ou créole haïtien.</p>
               </div>
-
               <button className="premiumTop">👑 Passer Premium</button>
             </header>
 
             <section className="statsGrid">
-              <div className="statCard">
-                <span>⚡</span>
-                <strong>Rapide</strong>
-                <p>Contenu prêt à publier</p>
-              </div>
-
-              <div className="statCard">
-                <span>HT</span>
-                <strong>Bilingue</strong>
-                <p>Français & Kreyòl Ayisyen</p>
-              </div>
-
-              <div className="statCard">
-                <span>📱</span>
-                <strong>Mobile</strong>
-                <p>Optimisé téléphone</p>
-              </div>
+              <div className="statCard"><span>⚡</span><div><strong>Rapide</strong><p>Contenu prêt à publier</p></div></div>
+              <div className="statCard"><span>HT</span><div><strong>Bilingue</strong><p>Français & Kreyòl Ayisyen</p></div></div>
+              <div className="statCard"><span>📱</span><div><strong>Mobile</strong><p>Installable sans store</p></div></div>
             </section>
 
             <section className="workspace">
@@ -174,11 +179,10 @@ function App() {
                 )}
 
                 <label>Nom ou idée du business</label>
-                <input
-                  value={business}
-                  onChange={(e) => setBusiness(e.target.value)}
-                  placeholder="Ex : Recharge Digicel et Natcom Haiti"
-                />
+                <input value={business} onChange={(e) => setBusiness(e.target.value)} placeholder="Ex : Recharge Digicel et Natcom Haiti" />
+
+                <label>Lien web du business</label>
+                <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="Ex : https://monsite.com" />
 
                 <label>Langue</label>
                 <select value={language} onChange={(e) => setLanguage(e.target.value)}>
@@ -207,18 +211,10 @@ function App() {
               <div className="panel resultPanel">
                 <div className="resultHeader">
                   <h2>✦ Résultat généré</h2>
-                  {result && (
-                    <button className="smallBtn" onClick={() => copyText()}>
-                      {copied ? "✅ Copié" : "📋 Copier le texte"}
-                    </button>
-                  )}
+                  {result && <button className="smallBtn" onClick={() => copyText()}>{copied ? "✅ Copié" : "📋 Copier"}</button>}
                 </div>
 
-                {!result && (
-                  <div className="emptyState">
-                    <p>Ton contenu généré apparaîtra ici.</p>
-                  </div>
-                )}
+                {!result && <div className="emptyState"><p>Ton contenu généré apparaîtra ici.</p></div>}
 
                 {result && (
                   <>
@@ -229,30 +225,14 @@ function App() {
 
                     <div className="shareArea">
                       <strong>Partager sur</strong>
-
                       <div className="shareButtons">
-                        <a className="whatsapp" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
-                          WhatsApp
-                        </a>
-
-                        <a className="facebook" href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`} target="_blank" rel="noreferrer">
-                          Facebook
-                        </a>
-
-                        <button className="instagram" onClick={() => copyText(result)}>
-                          Instagram
-                        </button>
-
-                        <a className="telegram" href={`https://t.me/share/url?url=${siteUrl}&text=${shareText}`} target="_blank" rel="noreferrer">
-                          Telegram
-                        </a>
-
-                        <button className="more" onClick={() => copyText(result)}>
-                          Plus d’options
-                        </button>
+                        <a className="whatsapp" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">WhatsApp</a>
+                        <a className="facebook" href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`} target="_blank" rel="noreferrer">Facebook</a>
+                        <button className="instagram" onClick={() => copyText(result)}>Instagram</button>
+                        <a className="telegram" href={`https://t.me/share/url?url=${siteUrl}&text=${shareText}`} target="_blank" rel="noreferrer">Telegram</a>
+                        <button className="more" onClick={() => copyText(result)}>Plus d’options</button>
                       </div>
-
-                      <small>Les liens de partage ouvriront l’application correspondante sur votre téléphone.</small>
+                      <small>Pour Instagram, le texte est copié. Colle-le ensuite dans ton post ou story.</small>
                     </div>
                   </>
                 )}
@@ -276,6 +256,7 @@ function App() {
                   {item.logo && <img src={item.logo} alt="logo" />}
                   <strong>{item.type}</strong>
                   <span>{item.business}</span>
+                  {item.website && <small>Site : {item.website}</small>}
                   <small>{item.language} • {item.date}</small>
                   <pre>{item.text}</pre>
                   <button onClick={() => copyText(item.text)}>Copier</button>
