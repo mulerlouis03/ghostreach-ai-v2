@@ -1,0 +1,84 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #050816, #0f172a);
+  color: white;
+}
+
+.app {
+  min-height: 100vh;
+  padding: 40px;
+}
+
+h1 {
+  font-size: 48px;
+  margin-bottom: 30px;
+  color: #7dd3fc;
+}
+
+.card {
+  max-width: 850px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  border-radius: 28px;
+  padding: 35px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+}
+
+h2 {
+  font-size: 30px;
+  margin-bottom: 25px;
+}
+
+input,
+select {
+  width: 100%;
+  max-width: 520px;
+  display: block;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+  background: #020617;
+  color: white;
+  font-size: 18px;
+}
+
+button {
+  margin-top: 8px;
+  margin-right: 12px;
+  padding: 14px 22px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #06b6d4, #2563eb);
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+pre {
+  white-space: pre-wrap;
+  margin-top: 30px;
+  padding: 25px;
+  border-radius: 22px;
+  background: #020617;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  font-size: 17px;
+  line-height: 1.7;
+}
