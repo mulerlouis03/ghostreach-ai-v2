@@ -6,12 +6,22 @@ import OpenAI from "openai";
 dotenv.config();
 
 const app = express();
+
 app.use(cors());
-app.use(express.json({ limit: "10mb" }));
+
+app.use(
+  express.json({
+    limit: "10mb",
+  })
+);
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+/* =========================
+   GENERATE TEXT
+========================= */
 
 app.post("/generate", async (req, res) => {
   try {
@@ -19,65 +29,93 @@ app.post("/generate", async (req, res) => {
 
     const languageInstruction =
       language === "Kreyòl Ayisyen"
-        ? "Écris uniquement en créole haïtien naturel, vendeur et moderne."
-        : "Écris uniquement en français naturel, moderne et vendeur.";
+        ? "Écris uniquement en créole haïtien moderne, vendeur et naturel."
+        : "Écris uniquement en français moderne, vendeur et professionnel.";
 
     const prompt = `
-Tu es un expert en marketing digital.
+Tu es un expert mondial du marketing digital.
 
 ${languageInstruction}
 
-Business : ${business}
-Lien web : ${website || "aucun lien"}
-Type de contenu : ${type}
+Business :
+${business}
+
+Lien web :
+${website || "aucun"}
+
+Type de contenu :
+${type}
 
 Règles :
 - texte prêt à publier
+- moderne
 - vendeur
-- simple
 - humain
 - emojis intelligents
-- appel à l'action clair
+- CTA clair
+- style réseaux sociaux
 `;
 
     const completion = await client.chat.completions.create({
       model: "gpt-4.1-mini",
-      messages: [{ role: "user", content: prompt }],
+
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
     });
 
-    res.json({ result: completion.choices[0].message.content });
+    res.json({
+      result: completion.choices[0].message.content,
+    });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
-      result: "Erreur texte IA",
       error: error.message,
     });
   }
 });
+
+/* =========================
+   GENERATE IMAGE
+========================= */
 
 app.post("/generate-image", async (req, res) => {
   try {
     const { business, type, language } = req.body;
 
     const prompt = `
-Crée une affiche publicitaire moderne pour les réseaux sociaux.
+Create a modern social media advertising poster.
 
-Business : ${business}
-Type : ${type}
-Langue : ${language}
+Business:
+${business}
 
-Style :
-- design premium
-- affiche marketing professionnelle
-- adaptée Facebook, Instagram, WhatsApp
-- couleurs modernes bleu, blanc, violet
-- visuel propre et attractif
-- sans texte trop long
-- style startup / Canva / publicité mobile
+Content type:
+${type}
+
+Language:
+${language}
+
+Style:
+- ultra realistic
+- premium ad
+- professional marketing
+- luxury startup design
+- mobile advertising
+- Facebook / Instagram quality
+- vibrant colors
+- modern lighting
+- visually attractive
 `;
 
     const image = await client.images.generate({
       model: "gpt-image-1",
+
       prompt,
+
       size: "1024x1024",
     });
 
@@ -87,14 +125,20 @@ Style :
       image: `data:image/png;base64,${base64}`,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       error: error.message,
     });
   }
 });
 
+/* =========================
+   SERVER
+========================= */
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log("Serveur lancé sur port " + PORT);
+  console.log(`Serveur lancé sur port ${PORT}`);
 });

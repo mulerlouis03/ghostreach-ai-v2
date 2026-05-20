@@ -1,17 +1,22 @@
-import React, { useState } from "react";import html2canvas from "html2canvas";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
+import html2canvas from "html2canvas";
 import "./style.css";
 
 const API_URL = "https://ghostreach-ai-v2.onrender.com";
 
 function App() {
-  const [business, setBusiness] = useState("Recharge Digicel et Natcom Haiti");
+  const [business, setBusiness] = useState(
+    "Recharge Digicel et Natcom Haiti"
+  );
+
   const [website, setWebsite] = useState("");
   const [type, setType] = useState("Pub Facebook");
   const [language, setLanguage] = useState("Français");
 
   const [result, setResult] = useState("");
   const [generatedImage, setGeneratedImage] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
 
@@ -19,6 +24,7 @@ function App() {
 
   function handleLogoUpload(e) {
     const file = e.target.files[0];
+
     if (!file) return;
 
     const reader = new FileReader();
@@ -39,6 +45,7 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           business,
           website,
@@ -49,7 +56,7 @@ function App() {
 
       const data = await response.json();
 
-      setResult(data.result || "Erreur génération texte.");
+      setResult(data.result || "Erreur génération.");
     } catch {
       setResult("Erreur serveur.");
     } finally {
@@ -66,6 +73,7 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           business,
           type,
@@ -79,7 +87,7 @@ function App() {
         setGeneratedImage(data.image);
       }
     } catch {
-      console.log("Erreur image");
+      console.log("Erreur image.");
     } finally {
       setImageLoading(false);
     }
@@ -90,8 +98,11 @@ function App() {
 
     html2canvas(poster).then((canvas) => {
       const link = document.createElement("a");
-      link.download = "copynova-poster.png";
-      link.href = canvas.toDataURL();
+
+      link.download = "copynova-pub.png";
+
+      link.href = canvas.toDataURL("image/png");
+
       link.click();
     });
   }
@@ -123,13 +134,15 @@ function App() {
             <h1>Crée des publicités IA complètes</h1>
 
             <p>
-              Génère textes, images publicitaires et affiches professionnelles
-              automatiquement.
+              Génère automatiquement des textes marketing et affiches
+              professionnelles avec intelligence artificielle.
             </p>
           </div>
         </header>
 
         <section className="workspace">
+          {/* LEFT PANEL */}
+
           <div className="panel">
             <h2>✍️ Générateur IA</h2>
 
@@ -184,7 +197,9 @@ function App() {
               onClick={generateText}
               disabled={loading}
             >
-              {loading ? "Génération..." : "✨ Générer le texte"}
+              {loading
+                ? "Génération texte..."
+                : "✨ Générer le texte"}
             </button>
 
             <button
@@ -197,6 +212,8 @@ function App() {
                 : "🎨 Générer image IA"}
             </button>
           </div>
+
+          {/* RIGHT PANEL */}
 
           <div className="panel">
             <div className="posterPreview" id="posterPreview">
@@ -223,7 +240,11 @@ function App() {
                   <pre>{result}</pre>
 
                   {website && (
-                    <a href={website} target="_blank">
+                    <a
+                      href={website}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       Visiter le site
                     </a>
                   )}
