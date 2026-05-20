@@ -3,25 +3,22 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
     "server": "node src/server.js"
   },
-
   "dependencies": {
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "express": "latest",
+    "concurrently": "latest",
     "cors": "latest",
     "dotenv": "latest",
+    "express": "latest",
+    "html2canvas": "^1.4.1",
     "openai": "latest",
-    "concurrently": "latest"
-  },
-
-  "devDependencies": {}
+    "react": "latest",
+    "react-dom": "latest",
+    "vite": "latest"
+  }
 }
