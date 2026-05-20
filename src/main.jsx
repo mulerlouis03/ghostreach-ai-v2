@@ -15,12 +15,12 @@ const API_URL = "https://ghostreach-ai-v2.onrender.com";
 const ADMIN_EMAIL = "gayeplaisir@gmail.com";
 
 const firebaseConfig = {
-  apiKey: "COLLE_TA_CLE_FIREBASE",
-  authDomain: "COLLE_AUTH_DOMAIN",
-  projectId: "COLLE_PROJECT_ID",
-  storageBucket: "COLLE_STORAGE_BUCKET",
-  messagingSenderId: "COLLE_MESSAGING_SENDER_ID",
-  appId: "COLLE_APP_ID",
+  apiKey: "AIzaSyC3_Y5KCiPqOOCqrKqVa6AnDPt52De8RvM",
+  authDomain: "copynova-ai-5027c.firebaseapp.com",
+  projectId: "copynova-ai-5027c",
+  storageBucket: "copynova-ai-5027c.firebasestorage.app",
+  messagingSenderId: "360133301945",
+  appId: "1:360133301945:web:11e19c8b88bf5e971e6d68",
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
