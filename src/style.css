@@ -349,4 +349,48 @@ select {
   .textCard pre {
     font-size: 14px;
   }
+}.authBox {
+  margin-top: 20px;
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.authBox button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.authBox p {
+  font-size: 13px;
+  word-break: break-all;
+  margin-bottom: 6px;
+}
+
+.authBox strong {
+  color: #059669;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.authBox small {
+  color: #64748b;
+}
+
+.customTextarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+  resize: vertical;
 }

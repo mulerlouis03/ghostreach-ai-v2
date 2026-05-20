@@ -16,6 +16,7 @@
     "cors": "latest",
     "dotenv": "latest",
     "express": "latest",
+    "firebase": "^12.13.0",
     "html2canvas": "^1.4.1",
     "openai": "latest",
     "react": "latest",

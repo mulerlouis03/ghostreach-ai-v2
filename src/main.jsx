@@ -1,42 +1,76 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import html2canvas from "html2canvas";
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 import "./style.css";
 
 const API_URL = "https://ghostreach-ai-v2.onrender.com";
+const ADMIN_EMAIL = "gayeplaisir@gmail.com";
+
+const firebaseConfig = {
+  apiKey: "COLLE_TA_CLE_FIREBASE",
+  authDomain: "COLLE_AUTH_DOMAIN",
+  projectId: "COLLE_PROJECT_ID",
+  storageBucket: "COLLE_STORAGE_BUCKET",
+  messagingSenderId: "COLLE_MESSAGING_SENDER_ID",
+  appId: "COLLE_APP_ID",
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const provider = new GoogleAuthProvider();
 
 function App() {
-  const isAdmin = true;
+  const [user, setUser] = useState(null);
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   const [business, setBusiness] = useState("Recharge Digicel et Natcom Haiti");
   const [website, setWebsite] = useState("");
   const [type, setType] = useState("Pub Facebook");
   const [language, setLanguage] = useState("Français");
   const [adStyle, setAdStyle] = useState("Moderne premium");
+  const [customStyle, setCustomStyle] = useState("");
   const [palette, setPalette] = useState("dark");
 
   const [result, setResult] = useState("");
   const [generatedImage, setGeneratedImage] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
-
   const [logo, setLogo] = useState(null);
 
   const [imageCount, setImageCount] = useState(() => {
     return Number(localStorage.getItem("daily_image_count")) || 0;
   });
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  async function loginWithGoogle() {
+    await signInWithPopup(auth, provider);
+  }
+
+  async function logout() {
+    await signOut(auth);
+  }
+
   function handleLogoUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-
-    reader.onloadend = () => {
-      setLogo(reader.result);
-    };
-
+    reader.onloadend = () => setLogo(reader.result);
     reader.readAsDataURL(file);
   }
 
@@ -46,16 +80,8 @@ function App() {
     try {
       const response = await fetch(`${API_URL}/generate`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          business,
-          website,
-          type,
-          language,
-          adStyle,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ business, website, type, language, adStyle, customStyle }),
       });
 
       const data = await response.json();
@@ -68,6 +94,11 @@ function App() {
   }
 
   async function generateImage() {
+    if (!user) {
+      alert("Connecte-toi avec Google pour générer une image.");
+      return;
+    }
+
     if (!isAdmin && imageCount >= 3) {
       alert("⚠️ Limite gratuite atteinte. Passe Premium pour générer plus d’images.");
       return;
@@ -78,15 +109,8 @@ function App() {
     try {
       const response = await fetch(`${API_URL}/generate-image`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          business,
-          type,
-          language,
-          adStyle,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ business, type, language, adStyle, customStyle }),
       });
 
       const data = await response.json();
@@ -129,7 +153,6 @@ function App() {
       <aside className="sidebar">
         <div className="brand">
           <div className="logoMark">✦</div>
-
           <div>
             <h2>CopyNova AI</h2>
             <p>AI Marketing Generator</p>
@@ -143,15 +166,26 @@ function App() {
           <button>💎 Premium</button>
           <button>⚙️ Réglages</button>
         </nav>
+
+        <div className="authBox">
+          {!user ? (
+            <button onClick={loginWithGoogle}>Connexion Google</button>
+          ) : (
+            <>
+              <p>{user.email}</p>
+              {isAdmin && <strong>Admin illimité ✅</strong>}
+              {!isAdmin && <small>Utilisateur gratuit</small>}
+              <button onClick={logout}>Déconnexion</button>
+            </>
+          )}
+        </div>
       </aside>
 
       <main className="main">
         <header className="hero">
           <div>
             <h1>Crée des publicités IA complètes</h1>
-            <p>
-              Génère automatiquement textes, images et affiches publicitaires prêtes à publier.
-            </p>
+            <p>Génère automatiquement textes, images et affiches publicitaires prêtes à publier.</p>
           </div>
         </header>
 
@@ -163,17 +197,10 @@ function App() {
             <input type="file" accept="image/*" onChange={handleLogoUpload} />
 
             <label>Nom du business</label>
-            <input
-              value={business}
-              onChange={(e) => setBusiness(e.target.value)}
-            />
+            <input value={business} onChange={(e) => setBusiness(e.target.value)} />
 
             <label>Lien web</label>
-            <input
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              placeholder="https://monsite.com"
-            />
+            <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://monsite.com" />
 
             <label>Langue</label>
             <select value={language} onChange={(e) => setLanguage(e.target.value)}>
@@ -204,6 +231,14 @@ function App() {
               <option>Corporate professionnel</option>
               <option>Haïtien local chaleureux</option>
             </select>
+
+            <label>Style personnalisé</label>
+            <textarea
+              className="customTextarea"
+              value={customStyle}
+              onChange={(e) => setCustomStyle(e.target.value)}
+              placeholder="Ex : Je veux une pub colorée, ambiance Haïti, ton urgent, très émotionnelle..."
+            />
 
             <label>Lisibilité du texte</label>
             <select value={palette} onChange={(e) => setPalette(e.target.value)}>
@@ -237,11 +272,7 @@ function App() {
           <div className="panel">
             <div className={`posterPreview ${palette}`} id="posterPreview">
               {generatedImage && (
-                <img
-                  className="posterBackground"
-                  src={generatedImage}
-                  alt="Background"
-                />
+                <img className="posterBackground" src={generatedImage} alt="Background" />
               )}
 
               <div className="posterOverlay">
