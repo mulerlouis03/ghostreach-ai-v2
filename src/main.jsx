@@ -6,10 +6,14 @@ import "./style.css";
 const API_URL = "https://ghostreach-ai-v2.onrender.com";
 
 function App() {
+  const isAdmin = true;
+
   const [business, setBusiness] = useState("Recharge Digicel et Natcom Haiti");
   const [website, setWebsite] = useState("");
   const [type, setType] = useState("Pub Facebook");
   const [language, setLanguage] = useState("Français");
+  const [adStyle, setAdStyle] = useState("Moderne premium");
+  const [palette, setPalette] = useState("dark");
 
   const [result, setResult] = useState("");
   const [generatedImage, setGeneratedImage] = useState("");
@@ -50,11 +54,12 @@ function App() {
           website,
           type,
           language,
+          adStyle,
         }),
       });
 
       const data = await response.json();
-      setResult(data.result || "Erreur génération texte.");
+      setResult(data.result || data.error || "Erreur génération texte.");
     } catch {
       setResult("Erreur serveur.");
     } finally {
@@ -63,7 +68,7 @@ function App() {
   }
 
   async function generateImage() {
-    if (imageCount >= 3) {
+    if (!isAdmin && imageCount >= 3) {
       alert("⚠️ Limite gratuite atteinte. Passe Premium pour générer plus d’images.");
       return;
     }
@@ -80,6 +85,7 @@ function App() {
           business,
           type,
           language,
+          adStyle,
         }),
       });
 
@@ -88,9 +94,11 @@ function App() {
       if (data.image) {
         setGeneratedImage(data.image);
 
-        const newCount = imageCount + 1;
-        setImageCount(newCount);
-        localStorage.setItem("daily_image_count", newCount);
+        if (!isAdmin) {
+          const newCount = imageCount + 1;
+          setImageCount(newCount);
+          localStorage.setItem("daily_image_count", newCount);
+        }
       } else {
         alert("Erreur image : " + (data.error || "image non générée"));
       }
@@ -104,7 +112,11 @@ function App() {
   function downloadPoster() {
     const poster = document.getElementById("posterPreview");
 
-    html2canvas(poster).then((canvas) => {
+    html2canvas(poster, {
+      useCORS: true,
+      scale: 2,
+      backgroundColor: null,
+    }).then((canvas) => {
       const link = document.createElement("a");
       link.download = "copynova-pub.png";
       link.href = canvas.toDataURL("image/png");
@@ -138,8 +150,7 @@ function App() {
           <div>
             <h1>Crée des publicités IA complètes</h1>
             <p>
-              Génère automatiquement des textes marketing et affiches publicitaires.
-              Gratuit : 3 images IA low-cost.
+              Génère automatiquement textes, images et affiches publicitaires prêtes à publier.
             </p>
           </div>
         </header>
@@ -183,13 +194,40 @@ function App() {
               <option>Message Telegram</option>
             </select>
 
+            <label>Style de publicité</label>
+            <select value={adStyle} onChange={(e) => setAdStyle(e.target.value)}>
+              <option>Moderne premium</option>
+              <option>Flashy réseaux sociaux</option>
+              <option>Luxe minimaliste</option>
+              <option>Promotion urgente</option>
+              <option>Style jeune TikTok</option>
+              <option>Corporate professionnel</option>
+              <option>Haïtien local chaleureux</option>
+            </select>
+
+            <label>Lisibilité du texte</label>
+            <select value={palette} onChange={(e) => setPalette(e.target.value)}>
+              <option value="dark">Texte blanc sur fond sombre</option>
+              <option value="light">Texte noir sur carte claire</option>
+              <option value="blue">Palette bleue premium</option>
+              <option value="gold">Palette dorée luxe</option>
+            </select>
+
             <button className="generateBtn" onClick={generateText} disabled={loading}>
               {loading ? "Génération texte..." : "✨ Générer le texte"}
             </button>
 
-            <p className="freeLimit">
-              Images gratuites restantes : {Math.max(0, 3 - imageCount)}
-            </p>
+            {!isAdmin && (
+              <p className="freeLimit">
+                Images gratuites restantes : {Math.max(0, 3 - imageCount)}
+              </p>
+            )}
+
+            {isAdmin && (
+              <p className="freeLimit adminLimit">
+                Admin : images illimitées activées ✅
+              </p>
+            )}
 
             <button className="imageBtn" onClick={generateImage} disabled={imageLoading}>
               {imageLoading ? "Création image..." : "🎨 Générer image IA low-cost"}
@@ -197,7 +235,7 @@ function App() {
           </div>
 
           <div className="panel">
-            <div className="posterPreview" id="posterPreview">
+            <div className={`posterPreview ${palette}`} id="posterPreview">
               {generatedImage && (
                 <img
                   className="posterBackground"
@@ -207,19 +245,21 @@ function App() {
               )}
 
               <div className="posterOverlay">
-                {logo && (
-                  <img className="posterLogo" src={logo} alt="Logo" />
-                )}
+                <div className="posterTop">
+                  {logo && <img className="posterLogo" src={logo} alt="Logo" />}
+                </div>
 
                 <div className="posterContent">
-                  <h2>{business}</h2>
-                  <pre>{result}</pre>
+                  <div className="textCard">
+                    <h2>{business}</h2>
+                    <pre>{result || "Ton texte publicitaire apparaîtra ici."}</pre>
 
-                  {website && (
-                    <a href={website} target="_blank" rel="noreferrer">
-                      Visiter le site
-                    </a>
-                  )}
+                    {website && (
+                      <a href={website} target="_blank" rel="noreferrer">
+                        Visiter le site
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
