@@ -2,38 +2,35 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
 const app = express();
 
 app.use(cors());
+app.use(express.json({ limit: "10mb" }));
 
-app.use(
-  express.json({
-    limit: "10mb",
-  })
-);
-
-const client = new OpenAI({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-/* =========================
-   GENERATE TEXT
-========================= */
+const gemini = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
+/* TEXTE AVEC GEMINI */
 app.post("/generate", async (req, res) => {
   try {
     const { business, website, type, language } = req.body;
 
     const languageInstruction =
       language === "Kreyòl Ayisyen"
-        ? "Écris uniquement en créole haïtien moderne, vendeur et naturel."
-        : "Écris uniquement en français moderne, vendeur et professionnel.";
+        ? "Écris uniquement en créole haïtien naturel, clair, vendeur et moderne."
+        : "Écris uniquement en français naturel, clair, vendeur et professionnel.";
 
     const prompt = `
-Tu es un expert mondial du marketing digital.
+Tu es un expert mondial du marketing digital, du copywriting et de la vente sur les réseaux sociaux.
 
 ${languageInstruction}
 
@@ -51,38 +48,31 @@ Règles :
 - moderne
 - vendeur
 - humain
+- simple
 - emojis intelligents
-- CTA clair
-- style réseaux sociaux
+- appel à l’action clair
+- ne force jamais Digicel si l’utilisateur demande Natcom
+- mentionne Digicel ET Natcom seulement si le business parle de recharge mobile
 `;
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4.1-mini",
-
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    const response = await gemini.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
     });
 
     res.json({
-      result: completion.choices[0].message.content,
+      result: response.text,
     });
   } catch (error) {
     console.log(error);
-
     res.status(500).json({
+      result: "Erreur génération texte Gemini",
       error: error.message,
     });
   }
 });
 
-/* =========================
-   GENERATE IMAGE
-========================= */
-
+/* IMAGE AVEC OPENAI */
 app.post("/generate-image", async (req, res) => {
   try {
     const { business, type, language } = req.body;
@@ -100,22 +90,20 @@ Language:
 ${language}
 
 Style:
-- ultra realistic
-- premium ad
-- professional marketing
-- luxury startup design
-- mobile advertising
-- Facebook / Instagram quality
+- premium advertisement
+- professional social media poster
+- Facebook / Instagram / WhatsApp quality
+- modern startup design
 - vibrant colors
-- modern lighting
-- visually attractive
+- clean layout
+- mobile-first advertising
+- realistic marketing visual
+- no long text
 `;
 
-    const image = await client.images.generate({
+    const image = await openai.images.generate({
       model: "gpt-image-1",
-
       prompt,
-
       size: "1024x1024",
     });
 
@@ -126,19 +114,15 @@ Style:
     });
   } catch (error) {
     console.log(error);
-
     res.status(500).json({
       error: error.message,
     });
   }
 });
 
-/* =========================
-   SERVER
-========================= */
-
+/* SERVEUR */
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log(`Serveur lancé sur port ${PORT}`);
+  console.log("Serveur lancé sur port " + PORT);
 });
