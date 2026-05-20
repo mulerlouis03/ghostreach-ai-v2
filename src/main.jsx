@@ -6,10 +6,7 @@ import "./style.css";
 const API_URL = "https://ghostreach-ai-v2.onrender.com";
 
 function App() {
-  const [business, setBusiness] = useState(
-    "Recharge Digicel et Natcom Haiti"
-  );
-
+  const [business, setBusiness] = useState("Recharge Digicel et Natcom Haiti");
   const [website, setWebsite] = useState("");
   const [type, setType] = useState("Pub Facebook");
   const [language, setLanguage] = useState("Français");
@@ -22,9 +19,12 @@ function App() {
 
   const [logo, setLogo] = useState(null);
 
+  const [imageCount, setImageCount] = useState(() => {
+    return Number(localStorage.getItem("daily_image_count")) || 0;
+  });
+
   function handleLogoUpload(e) {
     const file = e.target.files[0];
-
     if (!file) return;
 
     const reader = new FileReader();
@@ -45,7 +45,6 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           business,
           website,
@@ -55,8 +54,7 @@ function App() {
       });
 
       const data = await response.json();
-
-      setResult(data.result || "Erreur génération.");
+      setResult(data.result || "Erreur génération texte.");
     } catch {
       setResult("Erreur serveur.");
     } finally {
@@ -65,6 +63,11 @@ function App() {
   }
 
   async function generateImage() {
+    if (imageCount >= 3) {
+      alert("⚠️ Limite gratuite atteinte. Passe Premium pour générer plus d’images.");
+      return;
+    }
+
     setImageLoading(true);
 
     try {
@@ -73,7 +76,6 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           business,
           type,
@@ -85,9 +87,15 @@ function App() {
 
       if (data.image) {
         setGeneratedImage(data.image);
+
+        const newCount = imageCount + 1;
+        setImageCount(newCount);
+        localStorage.setItem("daily_image_count", newCount);
+      } else {
+        alert("Erreur image : " + (data.error || "image non générée"));
       }
     } catch {
-      console.log("Erreur image.");
+      alert("Erreur serveur image.");
     } finally {
       setImageLoading(false);
     }
@@ -98,11 +106,8 @@ function App() {
 
     html2canvas(poster).then((canvas) => {
       const link = document.createElement("a");
-
       link.download = "copynova-pub.png";
-
       link.href = canvas.toDataURL("image/png");
-
       link.click();
     });
   }
@@ -132,37 +137,27 @@ function App() {
         <header className="hero">
           <div>
             <h1>Crée des publicités IA complètes</h1>
-
             <p>
-              Génère automatiquement des textes marketing et affiches
-              professionnelles avec intelligence artificielle.
+              Génère automatiquement des textes marketing et affiches publicitaires.
+              Gratuit : 3 images IA low-cost.
             </p>
           </div>
         </header>
 
         <section className="workspace">
-          {/* LEFT PANEL */}
-
           <div className="panel">
             <h2>✍️ Générateur IA</h2>
 
             <label>Logo du business</label>
-
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleLogoUpload}
-            />
+            <input type="file" accept="image/*" onChange={handleLogoUpload} />
 
             <label>Nom du business</label>
-
             <input
               value={business}
               onChange={(e) => setBusiness(e.target.value)}
             />
 
             <label>Lien web</label>
-
             <input
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
@@ -170,50 +165,36 @@ function App() {
             />
 
             <label>Langue</label>
-
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-            >
+            <select value={language} onChange={(e) => setLanguage(e.target.value)}>
               <option>Français</option>
               <option>Kreyòl Ayisyen</option>
             </select>
 
             <label>Type de contenu</label>
-
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
+            <select value={type} onChange={(e) => setType(e.target.value)}>
               <option>Pub Facebook</option>
               <option>Post Instagram</option>
               <option>Message WhatsApp</option>
               <option>Script TikTok</option>
               <option>Script TikTok Viral</option>
+              <option>Message WhatsApp Business</option>
+              <option>Slogan Business Premium</option>
+              <option>Hashtags Instagram</option>
+              <option>Message Telegram</option>
             </select>
 
-            <button
-              className="generateBtn"
-              onClick={generateText}
-              disabled={loading}
-            >
-              {loading
-                ? "Génération texte..."
-                : "✨ Générer le texte"}
+            <button className="generateBtn" onClick={generateText} disabled={loading}>
+              {loading ? "Génération texte..." : "✨ Générer le texte"}
             </button>
 
-            <button
-              className="imageBtn"
-              onClick={generateImage}
-              disabled={imageLoading}
-            >
-              {imageLoading
-                ? "Création image..."
-                : "🎨 Générer image IA"}
+            <p className="freeLimit">
+              Images gratuites restantes : {Math.max(0, 3 - imageCount)}
+            </p>
+
+            <button className="imageBtn" onClick={generateImage} disabled={imageLoading}>
+              {imageLoading ? "Création image..." : "🎨 Générer image IA low-cost"}
             </button>
           </div>
-
-          {/* RIGHT PANEL */}
 
           <div className="panel">
             <div className="posterPreview" id="posterPreview">
@@ -227,24 +208,15 @@ function App() {
 
               <div className="posterOverlay">
                 {logo && (
-                  <img
-                    className="posterLogo"
-                    src={logo}
-                    alt="Logo"
-                  />
+                  <img className="posterLogo" src={logo} alt="Logo" />
                 )}
 
                 <div className="posterContent">
                   <h2>{business}</h2>
-
                   <pre>{result}</pre>
 
                   {website && (
-                    <a
-                      href={website}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
+                    <a href={website} target="_blank" rel="noreferrer">
                       Visiter le site
                     </a>
                   )}
@@ -253,10 +225,7 @@ function App() {
             </div>
 
             {(generatedImage || result) && (
-              <button
-                className="downloadBtn"
-                onClick={downloadPoster}
-              >
+              <button className="downloadBtn" onClick={downloadPoster}>
                 ⬇️ Télécharger la pub
               </button>
             )}
