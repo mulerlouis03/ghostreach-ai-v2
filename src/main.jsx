@@ -170,8 +170,8 @@ function App() {
         <div className="brand">
           <div className="logoMark">✦</div>
           <div>
-            <h2>CopyNova AI</h2>
-            <p>AI Marketing Generator</p>
+            <h2>TIKOAI</h2>
+            <p>Viral Content AI</p>
           </div>
         </div>
 
