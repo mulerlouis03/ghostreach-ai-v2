@@ -33,7 +33,8 @@ function App() {
 
   const [business, setBusiness] = useState("Recharge Digicel et Natcom Haiti");
   const [website, setWebsite] = useState("");
-  const [type, setType] = useState("Pub Facebook");
+  const [type, setType] = useState("Script TikTok Viral");
+  const [videoTemplate, setVideoTemplate] = useState("Hook 3 secondes");
   const [language, setLanguage] = useState("Français");
   const [adStyle, setAdStyle] = useState("Moderne premium");
   const [customStyle, setCustomStyle] = useState("");
@@ -81,7 +82,15 @@ function App() {
       const response = await fetch(`${API_URL}/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ business, website, type, language, adStyle, customStyle }),
+        body: JSON.stringify({
+          business,
+          website,
+          type,
+          language,
+          adStyle,
+          customStyle,
+          videoTemplate,
+        }),
       });
 
       const data = await response.json();
@@ -110,7 +119,14 @@ function App() {
       const response = await fetch(`${API_URL}/generate-image`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ business, type, language, adStyle, customStyle }),
+        body: JSON.stringify({
+          business,
+          type,
+          language,
+          adStyle,
+          customStyle,
+          videoTemplate,
+        }),
       });
 
       const data = await response.json();
@@ -185,7 +201,9 @@ function App() {
         <header className="hero">
           <div>
             <h1>Crée des publicités IA complètes</h1>
-            <p>Génère automatiquement textes, images et affiches publicitaires prêtes à publier.</p>
+            <p>
+              Génère textes, images et scripts TikTok/Reels prêts à publier.
+            </p>
           </div>
         </header>
 
@@ -200,7 +218,11 @@ function App() {
             <input value={business} onChange={(e) => setBusiness(e.target.value)} />
 
             <label>Lien web</label>
-            <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://monsite.com" />
+            <input
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://monsite.com"
+            />
 
             <label>Langue</label>
             <select value={language} onChange={(e) => setLanguage(e.target.value)}>
@@ -215,11 +237,36 @@ function App() {
               <option>Message WhatsApp</option>
               <option>Script TikTok</option>
               <option>Script TikTok Viral</option>
+              <option>Reel Instagram</option>
+              <option>Story Instagram</option>
+              <option>Short YouTube</option>
               <option>Message WhatsApp Business</option>
               <option>Slogan Business Premium</option>
               <option>Hashtags Instagram</option>
               <option>Message Telegram</option>
             </select>
+
+            {(type.includes("TikTok") ||
+              type.includes("Reel") ||
+              type.includes("Story") ||
+              type.includes("Short")) && (
+              <>
+                <label>Template vidéo TikTok/Reels</label>
+                <select
+                  value={videoTemplate}
+                  onChange={(e) => setVideoTemplate(e.target.value)}
+                >
+                  <option>Hook 3 secondes</option>
+                  <option>Problème → Solution</option>
+                  <option>Avant / Après</option>
+                  <option>Promo urgente</option>
+                  <option>Storytelling client</option>
+                  <option>Vidéo courte 15 secondes</option>
+                  <option>Témoignage client</option>
+                  <option>Top 3 raisons d’acheter</option>
+                </select>
+              </>
+            )}
 
             <label>Style de publicité</label>
             <select value={adStyle} onChange={(e) => setAdStyle(e.target.value)}>
@@ -237,7 +284,7 @@ function App() {
               className="customTextarea"
               value={customStyle}
               onChange={(e) => setCustomStyle(e.target.value)}
-              placeholder="Ex : Je veux une pub colorée, ambiance Haïti, ton urgent, très émotionnelle..."
+              placeholder="Ex : Fais apparaître le code promo NOVA20, style urgent rouge et jaune, ambiance Haïti..."
             />
 
             <label>Lisibilité du texte</label>
@@ -249,7 +296,7 @@ function App() {
             </select>
 
             <button className="generateBtn" onClick={generateText} disabled={loading}>
-              {loading ? "Génération texte..." : "✨ Générer le texte"}
+              {loading ? "Génération texte..." : "✨ Générer le contenu"}
             </button>
 
             {!isAdmin && (
@@ -283,7 +330,7 @@ function App() {
                 <div className="posterContent">
                   <div className="textCard">
                     <h2>{business}</h2>
-                    <pre>{result || "Ton texte publicitaire apparaîtra ici."}</pre>
+                    <pre>{result || "Ton contenu généré apparaîtra ici."}</pre>
 
                     {website && (
                       <a href={website} target="_blank" rel="noreferrer">

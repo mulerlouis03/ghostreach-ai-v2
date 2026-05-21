@@ -16,25 +16,54 @@ const openai = new OpenAI({
 
 app.post("/generate", async (req, res) => {
   try {
-    const { business, website, type, language, adStyle, customStyle } = req.body;
+    const {
+      business,
+      website,
+      type,
+      language,
+      adStyle,
+      customStyle,
+      videoTemplate,
+    } = req.body;
 
     const languageInstruction =
       language === "Kreyòl Ayisyen"
         ? "Écris uniquement en créole haïtien naturel, vendeur et facile à comprendre en Haïti."
         : "Écris uniquement en français naturel, vendeur et professionnel.";
 
+    const isVideo =
+      type?.includes("TikTok") ||
+      type?.includes("Reel") ||
+      type?.includes("Story") ||
+      type?.includes("Short");
+
+    const videoInstruction = isVideo
+      ? `
+FORMAT VIDÉO COURTE :
+Template demandé : ${videoTemplate}
+
+Structure obligatoire :
+1. Hook très fort dans les 3 premières secondes
+2. Scène 1
+3. Scène 2
+4. Texte à afficher à l’écran
+5. Voix off courte
+6. Appel à l’action final
+7. Hashtags adaptés
+`
+      : "";
+
     const customInstruction = customStyle?.trim()
       ? `
-INSTRUCTION PERSONNALISÉE OBLIGATOIRE DE L'UTILISATEUR :
+INSTRUCTION PERSONNALISÉE OBLIGATOIRE :
 ${customStyle}
 
-Tu dois absolument respecter cette instruction.
-Si l'utilisateur demande un code promo, une phrase précise, une offre, un ton ou un détail spécifique, il doit apparaître clairement dans le texte final.
+Tu dois absolument respecter cette instruction dans le texte final.
 `
-      : "Aucune instruction personnalisée fournie.";
+      : "Aucune instruction personnalisée.";
 
     const prompt = `
-Tu es un expert mondial du marketing digital, du copywriting et de la vente.
+Tu es un expert mondial du marketing digital, du copywriting, des publicités sociales et des vidéos courtes.
 
 ${languageInstruction}
 
@@ -44,20 +73,22 @@ ${business}
 Lien web :
 ${website || "aucun"}
 
-Type de contenu :
+Type de contenu demandé :
 ${type}
 
-Style général choisi :
+Style général :
 ${adStyle}
+
+${videoInstruction}
 
 ${customInstruction}
 
 Règles obligatoires :
-- Le texte doit être prêt à publier.
-- Respecte absolument l'instruction personnalisée si elle existe.
-- Si l'utilisateur demande un code promo, écris-le clairement.
-- Si l'utilisateur demande un style précis, adapte tout le texte à ce style.
-- Sois vendeur, humain, moderne et simple.
+- Le contenu doit être prêt à publier.
+- Respecte absolument le style personnalisé.
+- Si l'utilisateur demande un code promo, il doit apparaître clairement.
+- Si l'utilisateur demande un style visuel ou émotionnel, adapte le contenu à ce style.
+- Sois vendeur, humain, moderne, simple et convaincant.
 - Utilise des emojis intelligemment.
 - Ajoute un appel à l'action clair.
 - Mentionne Digicel ET Natcom seulement si le business parle de recharge mobile.
@@ -82,14 +113,35 @@ Règles obligatoires :
 
 app.post("/generate-image", async (req, res) => {
   try {
-    const { business, type, language, adStyle, customStyle } = req.body;
+    const {
+      business,
+      type,
+      language,
+      adStyle,
+      customStyle,
+      videoTemplate,
+    } = req.body;
+
+    const isVideo =
+      type?.includes("TikTok") ||
+      type?.includes("Reel") ||
+      type?.includes("Story") ||
+      type?.includes("Short");
 
     const customImageInstruction = customStyle?.trim()
       ? `
 USER CUSTOM IMAGE INSTRUCTION - MUST FOLLOW:
 ${customStyle}
 
-If the user asks for a promo code, coupon, specific visual style, color, mood, object, text, layout, country vibe, or branding detail, include it visually in the poster.
+If the user asks for a promo code, coupon, visual style, color, mood, object, layout, local Haitian vibe, or branding detail, include it visually in the poster.
+`
+      : "";
+
+    const videoImageInstruction = isVideo
+      ? `
+This poster should look like a vertical short-video cover / TikTok-Reels thumbnail.
+Video template:
+${videoTemplate}
 `
       : "";
 
@@ -105,20 +157,22 @@ ${type}
 Language:
 ${language}
 
-Selected ad style:
+Selected style:
 ${adStyle}
+
+${videoImageInstruction}
 
 ${customImageInstruction}
 
 Mandatory visual rules:
 - Follow the selected ad style.
 - Follow the custom user instruction if provided.
-- If a promo code is requested, include a visible promo-code style element on the poster.
-- Make it look like a real Facebook / Instagram / WhatsApp advertisement.
-- Modern colors.
+- If a promo code is requested, show it clearly as a promo badge.
+- Make it look like a real Facebook / Instagram / WhatsApp / TikTok advertisement.
+- Use modern colors.
 - Simple clean layout.
-- No long paragraphs of text.
 - Professional marketing poster.
+- No long paragraphs of text.
 `;
 
     const image = await openai.images.generate({
