@@ -1,9 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import ReactDOM from "react-dom/client";
 import "./style.css";
 
 const API_URL = "https://ghostreach-ai-v2.onrender.com";
 
-export default function App() {
+function App() {
   const [businessName, setBusinessName] = useState("");
   const [website, setWebsite] = useState("");
   const [language, setLanguage] = useState("Français");
@@ -311,7 +312,7 @@ export default function App() {
 
             <textarea
               className="customTextarea"
-              placeholder="Ex : ajoute un code promo, ambiance Haïti, style luxe, urgent..."
+              placeholder="Ex : ajoute un code promo, ambiance Haïti..."
               value={customStyle}
               onChange={(e) =>
                 setCustomStyle(
@@ -326,7 +327,7 @@ export default function App() {
 
             <textarea
               className="customTextarea"
-              placeholder="Ex : transforme le texte en vidéo TikTok avec 5 scènes, sous-titres animés, hook viral..."
+              placeholder="Ex : transforme ce texte en vidéo TikTok avec 5 scènes et sous-titres animés..."
               value={videoIdea}
               onChange={(e) =>
                 setVideoIdea(
@@ -362,7 +363,7 @@ export default function App() {
               }
             >
               🎬 Générer script
-              vidéo TikTok
+              TikTok
             </button>
           </div>
 
@@ -390,12 +391,13 @@ export default function App() {
                 <div className="posterContent">
                   <div className="textCard">
                     <h2>
-                      {businessName}
+                      {businessName ||
+                        "Nom Business"}
                     </h2>
 
                     <pre>
                       {generatedText ||
-                        "Ton contenu généré apparaîtra ici."}
+                        "Le contenu généré apparaîtra ici."}
                     </pre>
 
                     {website && (
@@ -471,3 +473,11 @@ export default function App() {
     </div>
   );
 }
+
+ReactDOM.createRoot(
+  document.getElementById("root")
+).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
