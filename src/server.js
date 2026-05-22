@@ -14,87 +14,51 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+/* ======================
+   TEXTE PUBLICITAIRE
+====================== */
+
 app.post("/generate", async (req, res) => {
   try {
     const {
-      business,
+      businessName,
       website,
-      type,
       language,
-      adStyle,
+      contentType,
+      styleType,
       customStyle,
-      videoTemplate,
     } = req.body;
 
-    const languageInstruction =
-      language === "Kreyòl Ayisyen"
-        ? "Écris uniquement en créole haïtien naturel, vendeur et facile à comprendre en Haïti."
-        : "Écris uniquement en français naturel, vendeur et professionnel.";
-
-    const isVideo =
-      type?.includes("TikTok") ||
-      type?.includes("Reel") ||
-      type?.includes("Story") ||
-      type?.includes("Short");
-
-    const videoInstruction = isVideo
-      ? `
-FORMAT VIDÉO COURTE :
-Template demandé : ${videoTemplate}
-
-Structure obligatoire :
-1. Hook très fort dans les 3 premières secondes
-2. Scène 1
-3. Scène 2
-4. Texte à afficher à l’écran
-5. Voix off courte
-6. Appel à l’action final
-7. Hashtags adaptés- IMPORTANT : pour une affiche publicitaire, génère un texte court : maximum 5 à 7 lignes.
-- Ne fais pas un long post complet.
-- Mets seulement : accroche + offre + code promo si demandé + appel à l’action.
-`
-      : "";
-
-    const customInstruction = customStyle?.trim()
-      ? `
-INSTRUCTION PERSONNALISÉE OBLIGATOIRE :
-${customStyle}
-
-Tu dois absolument respecter cette instruction dans le texte final.
-`
-      : "Aucune instruction personnalisée.";
-
     const prompt = `
-Tu es un expert mondial du marketing digital, du copywriting, des publicités sociales et des vidéos courtes.
-
-${languageInstruction}
+Tu es un expert mondial du marketing digital, TikTok, Facebook Ads, Instagram Reels et copywriting viral.
 
 Business :
-${business}
+${businessName}
 
-Lien web :
+Site web :
 ${website || "aucun"}
 
-Type de contenu demandé :
-${type}
+Langue :
+${language}
 
-Style général :
-${adStyle}
+Type de contenu :
+${contentType}
 
-${videoInstruction}
+Style :
+${styleType}
 
-${customInstruction}
+Instruction personnalisée obligatoire :
+${customStyle || "aucune"}
 
-Règles obligatoires :
-- Le contenu doit être prêt à publier.
-- Respecte absolument le style personnalisé.
-- Si l'utilisateur demande un code promo, il doit apparaître clairement.
-- Si l'utilisateur demande un style visuel ou émotionnel, adapte le contenu à ce style.
-- Sois vendeur, humain, moderne, simple et convaincant.
-- Utilise des emojis intelligemment.
-- Ajoute un appel à l'action clair.
-- Mentionne Digicel ET Natcom seulement si le business parle de recharge mobile.
-- Ne force jamais Digicel si l'utilisateur demande Natcom uniquement.
+Règles :
+- respecte absolument l’instruction personnalisée
+- si l’utilisateur demande un code promo, il doit apparaître clairement
+- texte court, puissant, prêt à publier
+- maximum 5 à 7 lignes
+- accroche forte
+- offre claire
+- appel à l’action
+- emojis intelligents
 `;
 
     const completion = await openai.chat.completions.create({
@@ -103,78 +67,43 @@ Règles obligatoires :
     });
 
     res.json({
-      result: completion.choices[0].message.content,
+      text: completion.choices[0].message.content,
     });
   } catch (error) {
     res.status(500).json({
-      result: "Erreur génération texte",
       error: error.message,
     });
   }
 });
 
+/* ======================
+   IMAGE PUBLICITAIRE
+====================== */
+
 app.post("/generate-image", async (req, res) => {
   try {
-    const {
-      business,
-      type,
-      language,
-      adStyle,
-      customStyle,
-      videoTemplate,
-    } = req.body;
-
-    const isVideo =
-      type?.includes("TikTok") ||
-      type?.includes("Reel") ||
-      type?.includes("Story") ||
-      type?.includes("Short");
-
-    const customImageInstruction = customStyle?.trim()
-      ? `
-USER CUSTOM IMAGE INSTRUCTION - MUST FOLLOW:
-${customStyle}
-
-If the user asks for a promo code, coupon, visual style, color, mood, object, layout, local Haitian vibe, or branding detail, include it visually in the poster.
-`
-      : "";
-
-    const videoImageInstruction = isVideo
-      ? `
-This poster should look like a vertical short-video cover / TikTok-Reels thumbnail.
-Video template:
-${videoTemplate}
-`
-      : "";
+    const { businessName, generatedText, customStyle } = req.body;
 
     const prompt = `
-Create a low-cost modern social media advertising poster.
+Create a modern advertising image for social media.
 
 Business:
-${business}
+${businessName}
 
-Content type:
-${type}
+Generated ad text:
+${generatedText || ""}
 
-Language:
-${language}
+Custom visual instructions:
+${customStyle || "modern premium style"}
 
-Selected style:
-${adStyle}
-
-${videoImageInstruction}
-
-${customImageInstruction}
-
-Mandatory visual rules:
-- Follow the selected ad style.
-- Follow the custom user instruction if provided.
-- If a promo code is requested, show it clearly as a promo badge.
-- Make it look like a real Facebook / Instagram / WhatsApp / TikTok advertisement.
-- Use modern colors.
-- Simple clean layout.
-- Professional marketing poster.
-- No long paragraphs of text.
+Style:
+- professional social media poster
+- TikTok / Instagram / Facebook ad
+- modern layout
+- vibrant colors
+- clean design
+- no long paragraphs
+- leave space for overlay text
 `;
 
     const image = await openai.images.generate({
@@ -185,7 +114,7 @@ Mandatory visual rules:
     });
 
     res.json({
-      image: `data:image/png;base64,${image.data[0].b64_json}`,
+      imageUrl: `data:image/png;base64,${image.data[0].b64_json}`,
     });
   } catch (error) {
     res.status(500).json({
@@ -193,6 +122,63 @@ Mandatory visual rules:
     });
   }
 });
+
+/* ======================
+   SCRIPT VIDÉO TIKTOK
+====================== */
+
+app.post("/generate-video-script", async (req, res) => {
+  try {
+    const { businessName, generatedText, videoIdea } = req.body;
+
+    const prompt = `
+Tu es un expert TikTok, Reels Instagram et vidéos courtes virales.
+
+Transforme ce texte publicitaire en script vidéo TikTok léger et prêt à tourner.
+
+Business :
+${businessName}
+
+Texte publicitaire :
+${generatedText}
+
+Consigne vidéo :
+${videoIdea || "Vidéo dynamique, moderne, facile à réaliser."}
+
+Crée un script avec :
+
+1. HOOK 3 SECONDES
+2. SCÈNE 1
+3. SCÈNE 2
+4. SCÈNE 3
+5. SCÈNE 4
+6. SCÈNE 5
+7. SOUS-TITRES ANIMÉS À AFFICHER
+8. IDÉE DE MUSIQUE OU AMBIANCE
+9. APPEL À L’ACTION FINAL
+10. HASHTAGS
+
+Format clair, court, pratique et directement utilisable.
+`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    res.json({
+      script: completion.choices[0].message.content,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+/* ======================
+   SERVER
+====================== */
 
 const PORT = process.env.PORT || 3001;
 
