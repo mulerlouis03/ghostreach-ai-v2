@@ -155,10 +155,12 @@ body {
 }
 
 /* LAYOUT */
-
 .workspace {
   display: grid;
-  grid-template-columns: minmax(420px, 540px) minmax(520px, 1fr);
+  grid-template-columns: 420px 1fr;
+  gap: 32px;
+  align-items: start;
+}
   gap: 28px;
   align-items: start;
 }
@@ -281,7 +283,7 @@ button:disabled {
 
 /* POSTER PREVIEW */
 
-.posterPreview {
+min-height: 720px;
   position: relative;
   width: 100%;
   min-height: 720px;
@@ -328,12 +330,14 @@ button:disabled {
 .posterContent {
   width: 100%;
 }
-
 .textCard {
-  border-radius: 28px;
-  padding: 28px;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+  border-radius: 26px;
+  padding: 26px;
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.55) !important;
+  color: white !important;
+  max-height: 420px;
+  overflow: hidden;
 }
 
 .textCard h2 {
@@ -345,9 +349,9 @@ button:disabled {
 .textCard pre {
   white-space: pre-wrap;
   font-family: inherit;
-  line-height: 1.7;
-  font-size: 16px;
-  margin-bottom: 18px;
+  line-height: 1.45;
+  font-size: 15px;
+  margin-bottom: 16px;
 }
 
 .textCard a {

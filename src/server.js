@@ -49,7 +49,9 @@ Structure obligatoire :
 4. Texte à afficher à l’écran
 5. Voix off courte
 6. Appel à l’action final
-7. Hashtags adaptés
+7. Hashtags adaptés- IMPORTANT : pour une affiche publicitaire, génère un texte court : maximum 5 à 7 lignes.
+- Ne fais pas un long post complet.
+- Mets seulement : accroche + offre + code promo si demandé + appel à l’action.
 `
       : "";
 
